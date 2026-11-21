@@ -4,7 +4,7 @@ Compose for native UI toolkits on DotKt. Application code is ordinary Compose (`
 `remember`, `mutableStateOf`, effects, `CompositionLocal`); the tree Compose maintains is a tree of
 native WinUI 3 elements. WinUI keeps layout, rendering, input, text, IME, accessibility and theming.
 It is built directly on the Compose runtime (`DotKtX.AndroidX.Compose.Runtime`, from
-`~/labo/dotktx.compose`), not on `androidx.compose.ui`.
+`dotktx.compose`), not on `androidx.compose.ui`.
 
 ```kotlin
 fun main() = application {
@@ -65,3 +65,20 @@ runtimeconfig.json. Apps that start WinUI themselves call `bootstrapWindowsAppSD
 
 On WSL with Windows interop, `bash scripts/uia.sh counter` (or `gallery`, `shell`, `interop`) starts a sample on Windows
 and runs its UI Automation test (`winui/tests/uia/`).
+
+## Packages
+
+An application references `DotKtX.Compose.UI.WinUI` and `Microsoft.WindowsAppSDK`. The package
+brings the Compose runtime and, through it, the Compose compiler plugin
+(`DotKtX.AndroidX.Compose.Compiler`), so `@Composable` code compiles without further setup. The
+packages depend on the exact DotKt SDK they were built with.
+
+```bash
+bash ../dotktx.compose/scripts/pack.sh   # Compose runtime and compiler plugin packages
+bash scripts/pack.sh                     # DotKtX.Compose.UI.WinUI into artifacts/packages
+bash scripts/verify-packages.sh          # counter built from the packages, run with its UI Automation test
+```
+
+`scripts/verify-packages.sh` restores the packages into a fresh cache and builds
+`winui/tests/package-smoke`, which takes the application manifest, the Windows App SDK version and the
+compiler plugin from the packages alone.

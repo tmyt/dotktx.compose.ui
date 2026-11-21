@@ -13,7 +13,8 @@
 
     <DotKtXWinUITargetFramework>net10.0-windows10.0.19041.0</DotKtXWinUITargetFramework>
     <DotKtXWindowsAppSDKVersion>2.2.0</DotKtXWindowsAppSDKVersion>
-    <DotKtXAtomicFUVersion>0.9.11</DotKtXAtomicFUVersion>
-    <DotKtXCoroutinesVersion>0.9.11</DotKtXCoroutinesVersion>
+    <DotKtXComposeUIVersion>0.1.0</DotKtXComposeUIVersion>
+    <DotKtXAtomicFUVersion>[0.9.11]</DotKtXAtomicFUVersion>
+    <DotKtXCoroutinesVersion>[0.9.11]</DotKtXCoroutinesVersion>
   </PropertyGroup>
 </Project>

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Run a built sample on Windows from WSL and drive it with its UI Automation test.
-# Usage: scripts/uia.sh counter|gallery|shell|interop   (build first with scripts/build.sh)
+# Usage: scripts/uia.sh counter|gallery|shell|interop [dir]   (build first with scripts/build.sh)
+# [dir] is the directory of the sample's .exe; it defaults to the scripts/build.sh output.
 set -euo pipefail
 REPO="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 sample="${1:?usage: scripts/uia.sh counter|gallery|shell|interop}"
@@ -11,7 +12,7 @@ case "$sample" in
   interop) name=Interop ;;
   *) echo "unknown sample: $sample" >&2; exit 2 ;;
 esac
-out="$REPO/artifacts/bin/winui/samples/$sample/Release/net10.0-windows10.0.19041.0/win-x64"
+out="${2:-$REPO/artifacts/bin/winui/samples/$sample/Release/net10.0-windows10.0.19041.0/win-x64}"
 log="$REPO/artifacts/logs/$sample.run.log"
 mkdir -p "$REPO/artifacts/logs"
 # Start the apphost, not `dotnet.exe <name>.dll`: only the apphost carries the application manifest (DPI awareness).

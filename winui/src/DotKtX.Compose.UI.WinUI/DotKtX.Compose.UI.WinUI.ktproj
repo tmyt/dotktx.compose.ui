@@ -2,10 +2,18 @@
   <PropertyGroup>
     <OutputType>Library</OutputType>
     <AssemblyName>DotKtX.Compose.UI.WinUI</AssemblyName>
+    <PackageId>DotKtX.Compose.UI.WinUI</PackageId>
+    <IsPackable>true</IsPackable>
+    <Version>$(DotKtXComposeUIVersion)</Version>
+    <Authors>yutaka</Authors>
+    <Description>WinUI 3 for the Compose runtime on DotKt: application and windows, controls, layouts, navigation, menus, dialogs, lazy lists and ComposeHost over native WinUI elements.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <TargetFramework>$(DotKtXWinUITargetFramework)</TargetFramework>
     <UseWinUI>true</UseWinUI>
     <!-- Allows compiling the windows TFM on Linux; running needs Windows. -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <!-- A code-only library has no resources; do not pack a PRI when generation is disabled. -->
+    <IncludeProjectPriFile Condition="'$(AppxGeneratePriEnabled)' == 'false'">false</IncludeProjectPriFile>
     <DotKtKotcOptions>-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi</DotKtKotcOptions>
   </PropertyGroup>
   <ItemGroup>

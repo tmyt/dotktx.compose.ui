@@ -14,6 +14,9 @@ $btn = $win.FindFirst([System.Windows.Automation.TreeScope]::Descendants, (New-O
 "before: " + $btn.Current.Name
 $inv = $btn.GetCurrentPattern([System.Windows.Automation.InvokePattern]::Pattern)
 for ($i = 1; $i -le 3; $i++) { $inv.Invoke(); Start-Sleep -Milliseconds 400; "after click ${i}: " + $btn.Current.Name }
+$count = $btn.Current.Name
 $win.GetCurrentPattern([System.Windows.Automation.WindowPattern]::Pattern).Close()
 Start-Sleep -Seconds 3
-if (Get-Process -Id $proc.Id -ErrorAction SilentlyContinue) { "still running after close" } else { "exited after close" }
+if (Get-Process -Id $proc.Id -ErrorAction SilentlyContinue) { "still running after close"; exit 1 }
+"exited after close"
+if ($count -ne '3') { "expected 3 after three clicks, got $count"; exit 1 }
