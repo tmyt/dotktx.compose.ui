@@ -8,6 +8,7 @@ import Microsoft.UI.Xaml.Thickness
 import Microsoft.UI.Xaml.UIElement
 import Microsoft.UI.Xaml.VerticalAlignment
 import Microsoft.UI.Xaml.Automation.AutomationProperties
+import Microsoft.UI.Xaml.Controls.Canvas
 import Microsoft.UI.Xaml.Controls.Grid
 import Microsoft.UI.Xaml.Controls.ToolTipService
 
@@ -86,6 +87,14 @@ fun Modifier.gridCell(row: Int, column: Int, rowSpan: Int = 1, columnSpan: Int =
     this then GridCellModifier(row, column, rowSpan, columnSpan)
 
 /**
+ * Position inside the enclosing `Canvas`, in effective pixels from its top-left corner (`Canvas.Left`,
+ * `Canvas.Top`). [zIndex] orders overlapping children (`Canvas.ZIndex`, higher on top); `null` keeps
+ * the order of the children.
+ */
+fun Modifier.canvasPosition(left: Double, top: Double, zIndex: Int? = null): Modifier =
+    this then CanvasPositionModifier(left, top, zIndex)
+
+/**
  * Sets any dependency property. Removing the modifier clears the local value, so the element falls
  * back to its style or template.
  *
@@ -137,6 +146,22 @@ private data class GridCellModifier(val row: Int, val column: Int, val rowSpan: 
         element.ClearValue(Grid.ColumnProperty)
         element.ClearValue(Grid.RowSpanProperty)
         element.ClearValue(Grid.ColumnSpanProperty)
+    }
+}
+
+private data class CanvasPositionModifier(val left: Double, val top: Double, val zIndex: Int?) : ElementModifier {
+    override val key: Any get() = CanvasPositionModifier::class
+
+    override fun apply(element: FrameworkElement) {
+        Canvas.SetLeft(element, left)
+        Canvas.SetTop(element, top)
+        if (zIndex == null) element.ClearValue(Canvas.ZIndexProperty) else Canvas.SetZIndex(element, zIndex)
+    }
+
+    override fun reset(element: FrameworkElement) {
+        element.ClearValue(Canvas.LeftProperty)
+        element.ClearValue(Canvas.TopProperty)
+        element.ClearValue(Canvas.ZIndexProperty)
     }
 }
 
