@@ -14,7 +14,7 @@ import Microsoft.UI.Xaml.Controls.ToggleMenuFlyoutItem
 import System.Collections.Generic.IList
 import Microsoft.UI.Xaml.Controls.DropDownButton as XamlDropDownButton
 
-/** An entry of a menu ([Modifier.contextMenu], [DropDownButton]). */
+/** An entry of a menu ([Modifier.contextMenu], [DropDownButton], [MenuBar]). */
 sealed class MenuEntry {
     /** A command. */
     data class Item(
@@ -98,11 +98,12 @@ private fun dropDownNode(button: XamlDropDownButton): ElementNode<XamlDropDownBu
 internal fun menuFlyout(entries: List<MenuEntry>): MenuFlyout {
     val flyout = MenuFlyout()
     // The subscription lives as long as the flyout, which is replaced when the entries change.
-    flyout.Opening.subscribe { _, _ -> fill(flyout.Items, entries) }
+    flyout.Opening.subscribe { _, _ -> fillMenuItems(flyout.Items, entries) }
     return flyout
 }
 
-private fun fill(items: IList<MenuFlyoutItemBase>, entries: List<MenuEntry>) {
+/** Replaces [items] with menu items built from [entries]. */
+internal fun fillMenuItems(items: IList<MenuFlyoutItemBase>, entries: List<MenuEntry>) {
     items.Clear()
     for (entry in entries) items.Add(menuItem(entry))
 }
@@ -118,12 +119,17 @@ private fun menuItem(entry: MenuEntry): MenuFlyoutItemBase = when (entry) {
         item.Text = entry.text
         item.IsEnabled = entry.enabled
         item.IsChecked = entry.checked
-        item.Click.subscribe { _, _ -> entry.onCheckedChange(item.IsChecked) }
+        item.Click.subscribe { _, _ ->
+            entry.onCheckedChange(item.IsChecked)
+            // An item shows the entry it was built from; the application's decision arrives as new
+            // entries, which rebuild the items. A rejected toggle therefore does not stay checked.
+            item.IsChecked = entry.checked
+        }
     }
     is MenuEntry.SubMenu -> MenuFlyoutSubItem().also { item ->
         item.Text = entry.text
         if (entry.icon != null) item.Icon = SymbolIcon(entry.icon)
-        fill(item.Items, entry.entries)
+        fillMenuItems(item.Items, entry.entries)
     }
     MenuEntry.Separator -> MenuFlyoutSeparator()
 }
