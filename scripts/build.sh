@@ -4,7 +4,7 @@
 set -euo pipefail
 REPO="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
 mkdir -p "$REPO/artifacts/logs"
-for sample in counter:Counter gallery:Gallery shell:Shell interop:Interop pickers:Pickers; do
+for sample in counter:Counter gallery:Gallery shell:Shell interop:Interop pickers:Pickers inputs:Inputs; do
   dir="${sample%%:*}"
   name="${sample##*:}"
   log="$REPO/artifacts/logs/$dir.build.log"

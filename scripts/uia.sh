@@ -11,6 +11,7 @@ case "$sample" in
   shell) name=Shell ;;
   interop) name=Interop ;;
   pickers) name=Pickers ;;
+  inputs) name=Inputs ;;
   *) echo "unknown sample: $sample" >&2; exit 2 ;;
 esac
 out="${2:-$REPO/artifacts/bin/winui/samples/$sample/Release/net10.0-windows10.0.19041.0/win-x64}"
