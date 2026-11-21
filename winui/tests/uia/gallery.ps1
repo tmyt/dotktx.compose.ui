@@ -137,10 +137,14 @@ Check 'dialog close button dismisses' 'dialog=cancelled' { Text $win 'dialogEcho
 Check 'dialog closed again' 'closed' { if (Dialog-Button 'Cancel') { 'open' } else { 'closed' } }
 
 # Menus: entries are rebuilt from the composed state each time a menu opens.
+# Menus open as top-level popups of the process; searching the whole desktop instead would walk
+# every other application's UI.
 function Menu-Item($name) {
   for ($t = 0; $t -lt 20; $t++) {
-    $m = $A::RootElement.FindFirst($Scope::Descendants, (New-Object System.Windows.Automation.AndCondition((Cond $A::ProcessIdProperty $processId), (Cond $A::NameProperty $name))))
-    if ($m) { return $m }
+    foreach ($top in $A::RootElement.FindAll($Scope::Children, (Cond $A::ProcessIdProperty $processId))) {
+      $m = $top.FindFirst($Scope::Descendants, (Cond $A::NameProperty $name))
+      if ($m) { return $m }
+    }
     Start-Sleep -Milliseconds 150
   }
   return $null

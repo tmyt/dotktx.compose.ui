@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # Run a built sample on Windows from WSL and drive it with its UI Automation test.
-# Usage: scripts/uia.sh counter|gallery|shell|interop [dir]   (build first with scripts/build.sh)
+# Usage: scripts/uia.sh <sample> [dir]   (a sample under winui/samples; build first with scripts/build.sh)
 # [dir] is the directory of the sample's .exe; it defaults to the scripts/build.sh output.
 set -euo pipefail
 REPO="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
-sample="${1:?usage: scripts/uia.sh counter|gallery|shell|interop}"
+sample="${1:?usage: scripts/uia.sh <sample> [dir]}"
 case "$sample" in
   counter) name=Counter ;;
   gallery) name=Gallery ;;
