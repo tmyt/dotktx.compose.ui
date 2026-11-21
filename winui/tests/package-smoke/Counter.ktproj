@@ -1,12 +1,16 @@
-<Project Sdk="DotKt.Sdk.Mpp">
-  <!-- The counter sample built against the packages instead of the source projects. The application
-       manifest, the Windows App SDK version and the Compose compiler plugin must all come from the
-       packages' buildTransitive targets, so nothing is imported here. -->
+<Project Sdk="DotKt.Sdk">
+  <!-- The counter sample as an application outside the repository would build it: the repository's
+       Directory.Build.* files are shadowed by empty ones here, and global.json selects .NET SDK 10,
+       whose Windows SDK projection is older than the one .NET SDK 11 picks. The application manifest,
+       the Windows App SDK setup and the Compose compiler plugin must all come from the packages'
+       buildTransitive targets. scripts/verify-packages.sh passes the version under test as
+       DotKtXComposeUIVersion. -->
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>$(DotKtXWinUITargetFramework)</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
     <UseWinUI>true</UseWinUI>
     <WindowsPackageType>None</WindowsPackageType>
+    <!-- Only needed to build on Linux. -->
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <RuntimeIdentifier>win-x64</RuntimeIdentifier>
     <SelfContained>false</SelfContained>
@@ -15,6 +19,6 @@
   <ItemGroup>
     <KotlinCompile Include="../../samples/counter/Counter.kt" />
     <PackageReference Include="DotKtX.Compose.UI.WinUI" Version="[$(DotKtXComposeUIVersion)]" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="$(DotKtXWindowsAppSDKVersion)" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
   </ItemGroup>
 </Project>

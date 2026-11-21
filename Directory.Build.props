@@ -12,8 +12,13 @@
     <DotKtXComposeRepo>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../dotktx.compose/'))</DotKtXComposeRepo>
 
     <DotKtXWinUITargetFramework>net10.0-windows10.0.19041.0</DotKtXWinUITargetFramework>
+    <!-- The Windows SDK projection (and with it WinRT.Runtime) otherwise follows the .NET SDK doing the
+         build: .NET SDK 11 picks 10.0.19041.87 (WinRT.Runtime 2.3.1.0), .NET SDK 10 picks 10.0.19041.57
+         (WinRT.Runtime 2.2.0.0). The library is compiled against the oldest one, so applications built
+         with either .NET SDK provide the WinRT.Runtime version it references or a newer one. -->
+    <WindowsSdkPackageVersion>10.0.19041.57</WindowsSdkPackageVersion>
     <DotKtXWindowsAppSDKVersion>2.2.0</DotKtXWindowsAppSDKVersion>
-    <DotKtXComposeUIVersion>0.2.0</DotKtXComposeUIVersion>
+    <DotKtXComposeUIVersion>0.2.1</DotKtXComposeUIVersion>
     <DotKtXAtomicFUVersion>[0.9.11]</DotKtXAtomicFUVersion>
     <DotKtXCoroutinesVersion>[0.9.11]</DotKtXCoroutinesVersion>
   </PropertyGroup>

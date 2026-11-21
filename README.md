@@ -81,6 +81,40 @@ brings the Compose runtime and, through it, the Compose compiler plugin
 (`DotKtX.AndroidX.Compose.Compiler`), so `@Composable` code compiles without further setup. The
 packages depend on the exact DotKt SDK they were built with.
 
+A complete application project:
+
+```xml
+<Project Sdk="DotKt.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <!-- net10.0-windows10.0.19041.0 or any later Windows version, such as 10.0.26100.0. -->
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <UseWinUI>true</UseWinUI>
+    <WindowsPackageType>None</WindowsPackageType>
+    <!-- The application manifest (DPI awareness) is embedded in the <name>.exe apphost. -->
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <!-- The class that holds `fun main()`: MainKt for Main.kt. -->
+    <StartupObject>MainKt</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="DotKtX.Compose.UI.WinUI" Version="0.2.1" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
+  </ItemGroup>
+</Project>
+```
+
+with `global.json` pinning the DotKt SDK the packages were built with:
+
+```json
+{ "msbuild-sdks": { "DotKt.Sdk": "0.9.31" } }
+```
+
+The library is compiled against the Windows SDK projection that .NET SDK 10 selects
+(`WindowsSdkPackageVersion` 10.0.19041.57, WinRT.Runtime 2.2.0.0) rather than the newer one .NET SDK 11
+selects, so applications built with either provide the WinRT.Runtime version it references or a newer
+one.
+
 ```bash
 bash ../dotktx.compose/scripts/pack.sh   # Compose runtime and compiler plugin packages
 bash scripts/pack.sh                     # DotKtX.Compose.UI.WinUI into artifacts/packages
@@ -88,5 +122,7 @@ bash scripts/verify-packages.sh          # counter built from the packages, run 
 ```
 
 `scripts/verify-packages.sh` restores the packages into a fresh cache and builds
-`winui/tests/package-smoke`, which takes the application manifest, the Windows App SDK version and the
-compiler plugin from the packages alone.
+`winui/tests/package-smoke` as an application outside the repository would: empty
+`Directory.Build.*` files shadow the repository's, and its `global.json` selects .NET SDK 10. The
+application manifest, the Windows App SDK version and the compiler plugin come from the packages alone,
+and a reference conflict warning (MSB3277) fails the check.

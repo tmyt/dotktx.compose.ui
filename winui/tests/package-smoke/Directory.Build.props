@@ -1,0 +1,4 @@
+<Project>
+  <!-- Stops MSBuild from importing the repository's Directory.Build.props: this project stands in for an
+       application outside the repository, so it sees none of the repository's properties. -->
+</Project>
