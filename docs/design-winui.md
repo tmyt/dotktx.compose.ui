@@ -380,6 +380,23 @@ Modifier.property(Control.FontSizeProperty, 24.0)     // SetValue / ClearValue
 | `contextMenu(entries)` | `UIElement.ContextFlyout` (§6.4) |
 | `property(dp, value)` | Any dependency property |
 
+Children of a `RelativePanel` are placed against each other, the way Compose's `ConstraintLayout`
+does it. References come from `createRefs()` in the panel's scope, and `Modifier.relative(ref) { … }`
+gives a child its reference and its constraints:
+
+```kotlin
+RelativePanel {
+    val (title, body) = createRefs()
+    TextBlock("Title", Modifier.relative(title) { alignTopWithPanel(); alignLeftWithPanel() })
+    TextBlock("Body", Modifier.relative(body) { below(title); alignLeftWith(title) })
+}
+```
+
+The modifier sets the element's `Name` to the reference's unique name and writes each constraint as
+the target's **name**. The panel resolves names among its children during layout, so constraints do
+not depend on the order in which children are emitted, and Compose never needs another node's
+element. A constraint that leaves the chain is cleared like any other modifier value.
+
 There is no `padding` modifier. In WinUI, padding belongs to `Control`, `Border` and some panels, so
 it is a parameter of those composables.
 
@@ -633,7 +650,7 @@ dotktx.compose.ui/
 | `shell` | `TitleBar`, `NavigationView` (controlled selection and pane), `TabView` (selection, close, add), `Expander` |
 | `interop` | A plain WinUI application that hosts Compose through `ComposeHost` and shares state with WinUI code |
 | `inputs` | Toggle, repeat and split buttons, `RatingControl`, `ColorPicker`, `AutoSuggestBox` (typing, rejected edits, suggestions, query), `RichEditBox` |
-| `pickers` | Date and time pickers, `CalendarView`, `PipsPager`, `SplitView`, `Viewbox`, `Canvas`, `InfoBadge`, `PersonPicture` |
+| `pickers` | Date and time pickers, `CalendarView`, `PipsPager`, `SplitView`, `Viewbox`, `Canvas`, `RelativePanel` (constraints changed by state), `InfoBadge`, `PersonPicture` |
 | `collections` | `ListView` and `GridView` (selection, keyed inserts), `TreeView` (selection, expansion), `FlipView`, `BreadcrumbBar`, `SelectorBar` |
 | `commands` | `CommandBar` (buttons, toggles, overflow), `MenuBar`, `Flyout`, `TeachingTip`, `WebView2` (navigation both ways) |
 

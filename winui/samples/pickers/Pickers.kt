@@ -23,6 +23,7 @@ import dotktx.compose.ui.winui.TimePicker
 import dotktx.compose.ui.winui.Viewbox
 import dotktx.compose.ui.winui.Window
 import dotktx.compose.ui.winui.application
+import dotktx.compose.ui.winui.RelativePanel
 import dotktx.compose.ui.winui.canvasPosition
 import dotktx.compose.ui.winui.gridCell
 import dotktx.compose.ui.winui.margin
@@ -171,6 +172,31 @@ private fun Layouts() {
     }
     TextBlock("left=${left.toInt()}", Modifier.testTag("leftEcho"))
     Button({ left += 50.0 }, Modifier.testTag("moveRight")) { TextBlock("Move right") }
+
+    // The action button is emitted before the children it does not depend on, and the body before the
+    // title it is placed against: constraints name their targets, so the order does not matter.
+    var bodyBeside by remember { mutableStateOf(false) }
+    RelativePanel(Modifier.size(360.0, 120.0)) {
+        val (title, body, action) = createRefs()
+        Button(
+            { bodyBeside = !bodyBeside },
+            Modifier.relative(action) { alignRightWithPanel(); alignBottomWithPanel() }.testTag("relAction"),
+        ) { TextBlock("Move body") }
+        TextBlock(
+            "Body",
+            Modifier.relative(body) {
+                if (bodyBeside) {
+                    rightOf(title)
+                    alignTopWith(title)
+                } else {
+                    below(title)
+                    alignLeftWith(title)
+                }
+            }.testTag("relBody"),
+        )
+        TextBlock("Title", Modifier.relative(title) { alignLeftWithPanel(); alignTopWithPanel() }.testTag("relTitle"))
+    }
+    TextBlock("body=${if (bodyBeside) "beside" else "below"}", Modifier.testTag("relEcho"))
 
     SplitView(
         paneOpen = paneOpen,

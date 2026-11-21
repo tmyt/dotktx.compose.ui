@@ -36,7 +36,7 @@ Windows and pass their UI Automation tests.
 | Inputs | `TextBox`, `PasswordBox`, `NumberBox`, `AutoSuggestBox`, `RichEditBox` (uncontrolled), `CheckBox`, `RadioButton`, `ToggleSwitch`, `Slider`, `ComboBox`, `RatingControl`, `ColorPicker` |
 | Dates and times | `DatePicker`, `TimePicker`, `CalendarDatePicker`, `CalendarView` |
 | Status | `ProgressBar`, `ProgressRing`, `InfoBar`, `InfoBadge`, `PersonPicture`, `Image` |
-| Layout | `StackPanel`, `Grid`, `Border`, `ScrollViewer`, `Viewbox`, `Canvas`, `SplitView`, `Expander` |
+| Layout | `StackPanel`, `Grid`, `Border`, `ScrollViewer`, `Viewbox`, `Canvas`, `RelativePanel` (the XAML counterpart of `ConstraintLayout`: `createRefs()` and `Modifier.relative(ref) { below(title) }`), `SplitView`, `Expander` |
 | Collections | `LazyItems` (virtualized over `ItemsRepeater`), `ListView`, `GridView` (single, multiple or no selection), `TreeView`, `FlipView`, `PipsPager`; optional keys keep per-item state |
 | Navigation | `TitleBar`, `NavigationView`, `TabView`, `BreadcrumbBar`, `SelectorBar` |
 | Commands and menus | `CommandBar` (`CommandBarEntry`), `MenuBar` (`MenuBarMenu`), `MenuEntry`, `Modifier.contextMenu` |

@@ -1,5 +1,5 @@
 # UI Automation test for the pickers sample: DatePicker, TimePicker, CalendarDatePicker, CalendarView,
-# InfoBadge, PersonPicture, PipsPager, Viewbox, Canvas and SplitView.
+# InfoBadge, PersonPicture, PipsPager, Viewbox, Canvas, RelativePanel and SplitView.
 # Start the sample first. Prints PASS/FAIL per check and exits 1 if any check fails.
 Add-Type -AssemblyName UIAutomationClient,UIAutomationTypes
 $A = [System.Windows.Automation.AutomationElement]
@@ -162,6 +162,20 @@ Check 'Canvas left' 'near' { Near (Marker-Offset) (10 * $scale) }
 Check 'Canvas top' 'near' { Near (Marker-Top) (20 * $scale) }
 Invoke-Id $win 'moveRight'
 Check 'state moves Canvas child' 'near' { Near (Marker-Offset) (60 * $scale) }
+
+# RelativePanel: the title is at the panel's top-left and the action button at its bottom-right; the
+# body sits below the title, and beside it once the state changes its constraints.
+function Rect($id) { (Find-Id $win $id).Current.BoundingRectangle }
+Check 'RelativePanel action at bottom-right (width)' 'near' { Near ((Rect 'relAction').Right - (Rect 'relTitle').X) (360 * $scale) }
+Check 'RelativePanel action at bottom-right (height)' 'near' { Near ((Rect 'relAction').Bottom - (Rect 'relTitle').Y) (120 * $scale) }
+Check 'RelativePanel body below title' 'below' { if ((Rect 'relBody').Y -ge (Rect 'relTitle').Bottom - 1) { 'below' } else { 'not below' } }
+Check 'RelativePanel body aligned left with title' 'near' { Near (Rect 'relBody').X (Rect 'relTitle').X }
+Invoke-Id $win 'relAction'
+Check 'state changes RelativePanel constraints' 'body=beside' { Text $win 'relEcho' }
+Check 'RelativePanel body right of title' 'beside' { if ((Rect 'relBody').X -ge (Rect 'relTitle').Right - 1) { 'beside' } else { 'not beside' } }
+Check 'RelativePanel body aligned top with title' 'near' { Near (Rect 'relBody').Y (Rect 'relTitle').Y }
+Invoke-Id $win 'relAction'
+Check 'RelativePanel body below title again' 'below' { if ((Rect 'relBody').Y -ge (Rect 'relTitle').Bottom - 1) { 'below' } else { 'not below' } }
 
 # SplitView: the application opens the pane, and light dismiss closes it and reaches the state.
 Check 'SplitView initial state' 'pane=closed' { Text $win 'paneEcho' }
