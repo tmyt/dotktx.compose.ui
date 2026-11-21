@@ -1,0 +1,25 @@
+<Project Sdk="DotKt.Sdk.Mpp">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>DotKtX.Compose.UI.WinUI</AssemblyName>
+    <TargetFramework>$(DotKtXWinUITargetFramework)</TargetFramework>
+    <UseWinUI>true</UseWinUI>
+    <!-- Allows compiling the windows TFM on Linux; running needs Windows. -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <DotKtKotcOptions>-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi</DotKtKotcOptions>
+  </PropertyGroup>
+  <ItemGroup>
+    <KotlinCompile Include="**/*.kt" />
+  </ItemGroup>
+  <Import Project="$(DotKtXComposeRepo)eng/ComposeCompilerPlugin.targets" />
+  <ItemGroup>
+    <ProjectReference Include="$(DotKtXComposeRepo)src/Runtime/Runtime.ktproj" />
+    <PackageReference Include="DotKtX.Coroutines" Version="$(DotKtXCoroutinesVersion)" />
+    <PackageReference Include="DotKtX.AtomicFU" Version="$(DotKtXAtomicFUVersion)" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="$(DotKtXWindowsAppSDKVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="buildTransitive/DotKtX.Compose.UI.WinUI.targets" Pack="true" PackagePath="buildTransitive/DotKtX.Compose.UI.WinUI.targets" />
+    <None Include="buildTransitive/DotKtX.Compose.UI.WinUI.manifest" Pack="true" PackagePath="buildTransitive/DotKtX.Compose.UI.WinUI.manifest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,50 @@
+<Project>
+  <PropertyGroup>
+    <_DotKtXComposeWinUIDefaultApplicationManifest>$(MSBuildThisFileDirectory)DotKtX.Compose.UI.WinUI.manifest</_DotKtXComposeWinUIDefaultApplicationManifest>
+  </PropertyGroup>
+
+  <!-- WinUI needs per-monitor (V2) DPI awareness; without a manifest the process is DPI-unaware and
+       Windows stretches its bitmap on high-DPI monitors. Executable WinUI consumers get this default
+       before the compiler or DotKt reads ApplicationManifest; an explicit manifest wins. -->
+  <Target Name="DotKtXComposeWinUISetDefaultApplicationManifest"
+          BeforeTargets="PrepareForBuild;SetWin32ManifestProperties;CoreCompile;DotKtIlEmit"
+          Condition="'$(UseWinUI)' == 'true' and
+                     ('$(OutputType)' == 'Exe' or '$(OutputType)' == 'WinExe') and
+                     '$(ApplicationManifest)' == '' and '$(NoWin32Manifest)' != 'true'">
+    <Error Condition="!Exists('$(_DotKtXComposeWinUIDefaultApplicationManifest)')"
+           Text="The DotKtX.Compose.UI.WinUI default application manifest is missing: $(_DotKtXComposeWinUIDefaultApplicationManifest)" />
+    <PropertyGroup>
+      <ApplicationManifest>$(_DotKtXComposeWinUIDefaultApplicationManifest)</ApplicationManifest>
+    </PropertyGroup>
+  </Target>
+  <!-- The Windows App SDK runtime to load is the one the application references, which may be newer
+       than the one this library was built against. Read its version from the referenced
+       Microsoft.WindowsAppSDK.Runtime package and pass it to the app through runtimeconfig.json,
+       where bootstrapWindowsAppSDK() reads it with AppContext.GetData. -->
+  <Target Name="DotKtXComposeWinUISetWindowsAppSDKVersion"
+          BeforeTargets="GenerateBuildRuntimeConfigurationFiles"
+          Condition="'$(UseWinUI)' == 'true' and ('$(OutputType)' == 'Exe' or '$(OutputType)' == 'WinExe')">
+    <PropertyGroup>
+      <_DotKtXWindowsAppSDKVersionInfo>$(MicrosoftWindowsAppSDKPackageDir)WindowsAppSDK-VersionInfo.xml</_DotKtXWindowsAppSDKVersionInfo>
+    </PropertyGroup>
+    <Error Condition="!Exists('$(_DotKtXWindowsAppSDKVersionInfo)')"
+           Text="DotKtX.Compose.UI.WinUI needs the Microsoft.WindowsAppSDK package; its version information was not found at '$(_DotKtXWindowsAppSDKVersionInfo)'." />
+    <XmlPeek XmlInputPath="$(_DotKtXWindowsAppSDKVersionInfo)" Query="/WindowsAppSDK/Release/MajorMinor/UInt32/text()">
+      <Output TaskParameter="Result" PropertyName="_DotKtXWindowsAppSDKMajorMinor" />
+    </XmlPeek>
+    <XmlPeek XmlInputPath="$(_DotKtXWindowsAppSDKVersionInfo)" Query="/WindowsAppSDK/Release/Tag/text()">
+      <Output TaskParameter="Result" PropertyName="_DotKtXWindowsAppSDKVersionTag" />
+    </XmlPeek>
+    <!-- Despite the element name, UInt16 holds the four 16-bit parts packed into one 64-bit value. -->
+    <XmlPeek XmlInputPath="$(_DotKtXWindowsAppSDKVersionInfo)" Query="/WindowsAppSDK/Runtime/Version/UInt16/text()">
+      <Output TaskParameter="Result" PropertyName="_DotKtXWindowsAppSDKMinVersion" />
+    </XmlPeek>
+    <ItemGroup>
+      <RuntimeHostConfigurationOption Include="DotKtX.Compose.UI.WinUI.WindowsAppSDK.MajorMinor" Value="$(_DotKtXWindowsAppSDKMajorMinor)" />
+      <RuntimeHostConfigurationOption Include="DotKtX.Compose.UI.WinUI.WindowsAppSDK.VersionTag" Value="$(_DotKtXWindowsAppSDKVersionTag)" />
+      <RuntimeHostConfigurationOption Include="DotKtX.Compose.UI.WinUI.WindowsAppSDK.MinVersion" Value="$(_DotKtXWindowsAppSDKMinVersion)" />
+      <!-- Regenerate runtimeconfig.json when the referenced Windows App SDK or this file changes. -->
+      <GenerateRuntimeConfigurationFilesInputs Include="$(_DotKtXWindowsAppSDKVersionInfo);$(MSBuildThisFileFullPath)" />
+    </ItemGroup>
+  </Target>
+</Project>

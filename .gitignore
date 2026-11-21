@@ -1,0 +1,11 @@
+# Generated outputs and local package feeds/caches
+artifacts/
+**/bin/
+**/obj/
+**/out/
+dist/
+*.log
+*.bak
+
+# Optional reference checkout; never required by build, test, or pack
+upstream/

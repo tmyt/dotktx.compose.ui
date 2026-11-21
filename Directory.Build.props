@@ -1,0 +1,19 @@
+<Project>
+  <PropertyGroup>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- Include the relative project directory so identically named projects of different backends stay apart. -->
+    <_DotKtXProjectPath>$([MSBuild]::MakeRelative('$(MSBuildThisFileDirectory)', '$(MSBuildProjectDirectory)'))</_DotKtXProjectPath>
+    <BaseOutputPath>$(MSBuildThisFileDirectory)artifacts/bin/$(_DotKtXProjectPath)/</BaseOutputPath>
+    <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)artifacts/obj/$(_DotKtXProjectPath)/</BaseIntermediateOutputPath>
+    <PackageOutputPath>$(MSBuildThisFileDirectory)artifacts/packages/</PackageOutputPath>
+
+    <!-- The Compose runtime sources and build helpers come from the sibling dotktx.compose checkout. -->
+    <DotKtXComposeRepo>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../dotktx.compose/'))</DotKtXComposeRepo>
+
+    <DotKtXWinUITargetFramework>net10.0-windows10.0.19041.0</DotKtXWinUITargetFramework>
+    <DotKtXWindowsAppSDKVersion>2.2.0</DotKtXWindowsAppSDKVersion>
+    <DotKtXAtomicFUVersion>0.9.11</DotKtXAtomicFUVersion>
+    <DotKtXCoroutinesVersion>0.9.11</DotKtXCoroutinesVersion>
+  </PropertyGroup>
+</Project>
