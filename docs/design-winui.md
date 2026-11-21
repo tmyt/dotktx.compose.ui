@@ -257,7 +257,7 @@ The applier sees only `Node.children`. The root of a window, dialog or host comp
 
 - **`None`** rejects children with an error that names the owner.
 - **`Single`** rejects a second child with an error that names the owner ("`Button` content must
-  emit one element; wrap several in a StackPanel or Grid"). See §9, decision 2.
+  emit one element; wrap several in a StackPanel or Grid"). See §10, decision 2.
 - **`Many.move`** follows the contract of `AbstractApplier.move`, where `to` is the destination index
   before the items are removed. It is implemented with `UIElementCollection.Move` for a single item,
   and with remove and insert for several.
@@ -311,8 +311,8 @@ into the control. It uses one of two patterns:
     content element moves into the `Child` of the selected item's host.
 - **Subcompositions.** Content that WinUI realizes on its own schedule gets a composition of its
   own, created with the caller's `CompositionContext` as its parent. Locals and invalidation
-  therefore still flow from the caller. `Window`, `ContentDialog`, `ComposeHost` and each realized
-  `LazyItems` element (§7) work this way.
+  therefore still flow from the caller. `Window`, `ContentDialog`, `Flyout`, `TeachingTip`,
+  `ComposeHost` and each realized item of the lists in §7 work this way.
 
 ## 5. Modifier
 
@@ -401,7 +401,7 @@ fun TextBlock(text: String, modifier: Modifier = Modifier, fontSize: Double = Do
 ```
 
 Inside the library, a WinUI type is imported under an alias when the composable and the class share
-a name (§9, decision 1).
+a name (§10, decision 1).
 
 `Updater.set` compares a value with the previous one, so a recomposition that produces the same
 `text` writes nothing to WinUI. The recomposition scope is the function, and the diff is per
@@ -467,16 +467,17 @@ of `NavigationView` and `TabView`:
 ### 6.4 Menus
 
 `MenuEntry` (`Item`, `Toggle`, `SubMenu`, `Separator`) describes menus as data.
-`Modifier.contextMenu(entries)` and `DropDownButton(entries)` turn the entries into a `MenuFlyout`.
-The flyout's items are created each time it opens. Toggle entries therefore always show the state
-that the application last composed, even after the user toggled one and the application rejected
-the change.
+`Modifier.contextMenu(entries)`, `DropDownButton`, `SplitButton` and `MenuBar` turn the entries into
+menu items. A flyout's items are created each time it opens, and `MenuBar`'s items when its entries
+change. After a toggle item reports a click, it shows its entry's value again: an accepted change
+arrives as new entries, and a rejected one does not stay checked. `CommandBar` describes its commands
+the same way (`CommandBarEntry`), and its toggles follow the composed value through `ControlledValue`.
 
 ### 6.5 Naming
 
 Wrapper composables use **WinUI names** (`TextBlock`, `StackPanel`, `Grid`, `Border`,
 `ToggleSwitch`, `NavigationView`). Parameters use Compose conventions: `onClick`, `onTextChange`,
-`modifier` as the first optional parameter, and a trailing `content` slot. See §9, decision 1.
+`modifier` as the first optional parameter, and a trailing `content` slot. See §10, decision 1.
 
 ## 7. Lists
 
@@ -508,6 +509,31 @@ not scrolling out of view. Lasting per-item state belongs in the items or above 
 `ItemsRepeater` realizes elements against the effective viewport, which includes outer
 `ScrollViewer`s, so the list needs a bounded size in its scrolling direction.
 
+`ListView`, `GridView`, `TreeView` and `FlipView` reuse the same per-item compositions
+(`ItemCompositions`), but these controls create their own containers.
+
+- **Item template.** The `ItemTemplate` is a template whose root is an empty `Grid`. The first time
+  a container is prepared, its template root becomes the item's host. The host stays with the
+  container through recycling.
+- **Binding.** `ListViewBase.ContainerContentChanging` is raised synchronously both when a container
+  is prepared for an item and when it goes to the recycle queue, so it binds and unbinds the
+  composition.
+  - `TreeView` finds its internal list on `Loaded` and binds through the same event.
+  - `FlipView` raises no such event. It checks its containers after each layout pass and binds the
+    ones that now show a different item.
+- **Change notifications.** `ListViewBase` ignores `IKeyIndexMapping` and recreates every container
+  on a reset. The items source therefore reports changes as individual inserts and removals,
+  computed from the keys, and falls back to a reset when most items change. Keyed rows keep their
+  state across inserts and removals around them; a row that moves gets a new element.
+- **Selection.** Selection is controlled: an index, a set of indices, or a key for `TreeView`.
+  `TreeView` expansion is controlled through a set of keys, or left to WinUI when that set is `null`.
+
+WinUI controls are not subclassed in Kotlin. XAML does not know the Kotlin type, so the control's
+default style is not applied (for example "Cannot apply a Style with TargetType TreeView"). Wrappers
+use events and template parts instead of overriding `OnApplyTemplate` or
+`PrepareContainerForItemOverride`. `ComposeHost` subclasses `ContentControl`, which works because it
+needs no control template of its own.
+
 ## 8. Interop
 
 | Direction | API |
@@ -520,7 +546,26 @@ composition when it is unloaded. Remembered state therefore does not survive rem
 the tree. The host uses the UI thread's shared `UIRuntime` (§3.5), so snapshot state written by
 plain WinUI code, such as an event handler, recomposes it.
 
-## 9. Design decisions
+## 9. Popups
+
+`Flyout` and `TeachingTip` are state-driven, like `ContentDialog`: they are shown while they are in
+the composition (or while `isOpen` is true), and dismissing them only calls `onDismissRequest`.
+Their content is a subcomposition (§4.4).
+
+A popup needs a target element in another part of the composition. The target is named by a
+remembered reference, as with Compose's `FocusRequester`:
+
+```kotlin
+val anchor = rememberPopupAnchor()
+Button(onClick = { showHelp = true }, Modifier.popupAnchor(anchor)) { TextBlock("Help") }
+if (showHelp) Flyout(anchor, onDismissRequest = { showHelp = false }) { HelpText() }
+```
+
+`Modifier.popupAnchor` stores the element in the anchor as snapshot state when the modifier is
+applied. A popup that reads the anchor therefore recomposes and opens once the target exists, even
+when the target lives in another composition, such as a `LazyItems` row.
+
+## 10. Design decisions
 
 1. **WinUI names for composables.** Compose foundation names (`Text`, `Column`) would suggest
    Compose UI semantics that WinUI does not have: a `Column` without `weight` would mislead more than
@@ -546,7 +591,7 @@ plain WinUI code, such as an event handler, recomposes it.
    request (`onCloseRequest`, `onDismissRequest`), and the application removes it from the
    composition. This keeps the composition the single source of truth, as controlled inputs do (§6.3).
 
-## 10. CompositionLocals
+## 11. CompositionLocals
 
 | Local | Value |
 |---|---|
@@ -557,7 +602,7 @@ plain WinUI code, such as an event handler, recomposes it.
 content provides the `XamlRoot` and `LocalWindow`. Inside a `ComposeHost`, the host itself provides
 the `XamlRoot`.
 
-## 11. Source layout
+## 12. Source layout
 
 ```text
 dotktx.compose.ui/
@@ -567,13 +612,13 @@ dotktx.compose.ui/
                        dispatcher, frame clock, GlobalSnapshotManager, bootstrap
     node/              Node, ElementNode, ChildSlot, WinUIApplier, emit helpers, ControlledValue
     modifier/          Modifier chain, ElementModifier, modifiers
-    controls/          TextBlock, Button, TextBox, ToggleSwitch, menus, …
-    layout/            StackPanel, Grid, Border, ScrollViewer, LazyItems, NavigationView, TabView, TitleBar, …
-  winui/samples/       counter, gallery, shell, interop
+    controls/          TextBlock, buttons, text inputs, pickers, menus, command bar, popups, WebView2, …
+    layout/            panels, ScrollViewer, SplitView, LazyItems, ListView, TreeView, NavigationView, TabView, …
+  winui/samples/       counter, gallery, shell, interop, inputs, pickers, collections, commands
   winui/tests/uia/     UI Automation tests for the samples
 ```
 
-## 12. Verification
+## 13. Verification
 
 - **WSL and Linux.** Everything compiles (the windows TFM with `EnableWindowsTargeting`).
 - **Windows.** The UI Automation tests (`winui/tests/uia/*.ps1`, run from WSL with
@@ -587,6 +632,13 @@ dotktx.compose.ui/
 | `gallery` | Controls and layouts; controlled inputs, including accepted and rejected edits; keyed list moves with remembered per-item state; modifiers; menus; `LazyItems`, with and without keys; `WindowState`; `ContentDialog`; a second window |
 | `shell` | `TitleBar`, `NavigationView` (controlled selection and pane), `TabView` (selection, close, add), `Expander` |
 | `interop` | A plain WinUI application that hosts Compose through `ComposeHost` and shares state with WinUI code |
+| `inputs` | Toggle, repeat and split buttons, `RatingControl`, `ColorPicker`, `AutoSuggestBox` (typing, rejected edits, suggestions, query), `RichEditBox` |
+| `pickers` | Date and time pickers, `CalendarView`, `PipsPager`, `SplitView`, `Viewbox`, `Canvas`, `InfoBadge`, `PersonPicture` |
+| `collections` | `ListView` and `GridView` (selection, keyed inserts), `TreeView` (selection, expansion), `FlipView`, `BreadcrumbBar`, `SelectorBar` |
+| `commands` | `CommandBar` (buttons, toggles, overflow), `MenuBar`, `Flyout`, `TeachingTip`, `WebView2` (navigation both ways) |
+
+UI Automation searches stay inside the sample's own windows: the test window, or the process's
+top-level windows for popups. Searching the whole desktop walks every other application's UI.
 
 Behavior is verified against real WinUI rather than a fake element tree. The problems a binding has
 to solve come from WinUI's own behavior: `TabView` copying the selected item's content,
