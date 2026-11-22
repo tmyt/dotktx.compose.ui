@@ -39,6 +39,7 @@ private fun relativePanelNode(panel: XamlRelativePanel): ElementNode<XamlRelativ
     ElementNode(panel, ChildSlot.Many(panel.Children))
 
 /** Receiver of [RelativePanel]'s content. */
+@LayoutScopeMarker
 object RelativePanelScope {
     /**
      * References for children of this panel, taken by destructuring: `val (a, b) = createRefs()`.

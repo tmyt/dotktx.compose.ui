@@ -8,8 +8,15 @@ import Microsoft.UI.Xaml.Thickness
 import Microsoft.UI.Xaml.UIElement
 import Microsoft.UI.Xaml.VerticalAlignment
 import Microsoft.UI.Xaml.Automation.AutomationProperties
-import Microsoft.UI.Xaml.Controls.Canvas
+import Microsoft.UI.Xaml.Controls.Border
+import Microsoft.UI.Xaml.Controls.ContentPresenter
+import Microsoft.UI.Xaml.Controls.Control
 import Microsoft.UI.Xaml.Controls.Grid
+import Microsoft.UI.Xaml.Controls.ItemsPresenter
+import Microsoft.UI.Xaml.Controls.RelativePanel
+import Microsoft.UI.Xaml.Controls.RichTextBlock
+import Microsoft.UI.Xaml.Controls.StackPanel
+import Microsoft.UI.Xaml.Controls.TextBlock
 import Microsoft.UI.Xaml.Controls.ToolTipService
 
 /** Position inside the space the parent offers. Start/End follow the element's `FlowDirection`. */
@@ -40,6 +47,26 @@ fun Modifier.margin(horizontal: Double, vertical: Double): Modifier = margin(hor
 
 fun Modifier.margin(start: Double, top: Double, end: Double, bottom: Double): Modifier =
     this then MarginModifier(start, top, end, bottom)
+
+/**
+ * `Padding`: space between the element's edge and its content, in effective pixels. Start/End follow
+ * the element's `FlowDirection`. Removing the modifier restores the padding from the element's style.
+ *
+ * Every control has padding, as do `Border`, `StackPanel`, `Grid`, `RelativePanel`, `TextBlock` and
+ * `RichTextBlock`. Elements without content to pad (`Image`, `Canvas`, `Viewbox`, shapes) have no
+ * padding property; on them the modifier has no effect, and a warning is printed once per element
+ * type.
+ *
+ * ```
+ * Button(onClick = {}, modifier = Modifier.margin(8.0).padding(16.0, 8.0)) { TextBlock("OK") }
+ * ```
+ */
+fun Modifier.padding(all: Double): Modifier = padding(all, all, all, all)
+
+fun Modifier.padding(horizontal: Double, vertical: Double): Modifier = padding(horizontal, vertical, horizontal, vertical)
+
+fun Modifier.padding(start: Double, top: Double, end: Double, bottom: Double): Modifier =
+    this then PaddingModifier(start, top, end, bottom)
 
 /** `Width`, in effective pixels. */
 fun Modifier.width(width: Double): Modifier =
@@ -82,18 +109,6 @@ fun Modifier.requestedTheme(theme: ElementTheme): Modifier =
 fun Modifier.alpha(alpha: Double): Modifier =
     this then PropertyModifier(UIElement.OpacityProperty, alpha)
 
-/** Cell of the enclosing `Grid` (`Grid.Row`, `Grid.Column`, `Grid.RowSpan`, `Grid.ColumnSpan`). */
-fun Modifier.gridCell(row: Int, column: Int, rowSpan: Int = 1, columnSpan: Int = 1): Modifier =
-    this then GridCellModifier(row, column, rowSpan, columnSpan)
-
-/**
- * Position inside the enclosing `Canvas`, in effective pixels from its top-left corner (`Canvas.Left`,
- * `Canvas.Top`). [zIndex] orders overlapping children (`Canvas.ZIndex`, higher on top); `null` keeps
- * the order of the children.
- */
-fun Modifier.canvasPosition(left: Double, top: Double, zIndex: Int? = null): Modifier =
-    this then CanvasPositionModifier(left, top, zIndex)
-
 /**
  * Sets any dependency property. Removing the modifier clears the local value, so the element falls
  * back to its style or template.
@@ -131,38 +146,41 @@ private data class MarginModifier(val start: Double, val top: Double, val end: D
     }
 }
 
-private data class GridCellModifier(val row: Int, val column: Int, val rowSpan: Int, val columnSpan: Int) : ElementModifier {
-    override val key: Any get() = GridCellModifier::class
+/**
+ * WinUI defines `Padding` separately on each type that has it rather than on `FrameworkElement`, so
+ * the property is looked up from the element's type.
+ */
+private data class PaddingModifier(val start: Double, val top: Double, val end: Double, val bottom: Double) : ElementModifier {
+    override val key: Any get() = PaddingModifier::class
 
     override fun apply(element: FrameworkElement) {
-        Grid.SetRow(element, row)
-        Grid.SetColumn(element, column)
-        Grid.SetRowSpan(element, rowSpan)
-        Grid.SetColumnSpan(element, columnSpan)
+        val property = paddingProperty(element)
+        if (property == null) warnNoPadding(element) else element.SetValue(property, Thickness(start, top, end, bottom))
     }
 
     override fun reset(element: FrameworkElement) {
-        element.ClearValue(Grid.RowProperty)
-        element.ClearValue(Grid.ColumnProperty)
-        element.ClearValue(Grid.RowSpanProperty)
-        element.ClearValue(Grid.ColumnSpanProperty)
+        paddingProperty(element)?.let { element.ClearValue(it) }
     }
 }
 
-private data class CanvasPositionModifier(val left: Double, val top: Double, val zIndex: Int?) : ElementModifier {
-    override val key: Any get() = CanvasPositionModifier::class
+private fun paddingProperty(element: FrameworkElement): DependencyProperty? = when (element) {
+    is Control -> Control.PaddingProperty
+    is Border -> Border.PaddingProperty
+    is StackPanel -> StackPanel.PaddingProperty
+    is Grid -> Grid.PaddingProperty
+    is RelativePanel -> RelativePanel.PaddingProperty
+    is TextBlock -> TextBlock.PaddingProperty
+    is RichTextBlock -> RichTextBlock.PaddingProperty
+    is ContentPresenter -> ContentPresenter.PaddingProperty
+    is ItemsPresenter -> ItemsPresenter.PaddingProperty
+    else -> null
+}
 
-    override fun apply(element: FrameworkElement) {
-        Canvas.SetLeft(element, left)
-        Canvas.SetTop(element, top)
-        if (zIndex == null) element.ClearValue(Canvas.ZIndexProperty) else Canvas.SetZIndex(element, zIndex)
-    }
+private val warnedNoPadding = HashSet<String>()
 
-    override fun reset(element: FrameworkElement) {
-        element.ClearValue(Canvas.LeftProperty)
-        element.ClearValue(Canvas.TopProperty)
-        element.ClearValue(Canvas.ZIndexProperty)
-    }
+private fun warnNoPadding(element: FrameworkElement) {
+    val type = element::class.simpleName ?: return
+    if (warnedNoPadding.add(type)) println("dotktx.compose.ui.winui: Modifier.padding has no effect on $type, which has no Padding property")
 }
 
 private data class PropertyModifier(val property: DependencyProperty, val value: Any?) : ElementModifier {

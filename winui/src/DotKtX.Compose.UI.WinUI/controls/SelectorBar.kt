@@ -2,13 +2,11 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
-import Microsoft.UI.Xaml.Controls.Symbol
-import Microsoft.UI.Xaml.Controls.SymbolIcon
 import Microsoft.UI.Xaml.Controls.SelectorBar as XamlSelectorBar
 import Microsoft.UI.Xaml.Controls.SelectorBarItem as XamlSelectorBarItem
 
 /** One item of a [SelectorBar]: a label and an optional icon. */
-data class SelectorBarEntry(val text: String, val icon: Symbol? = null)
+data class SelectorBarEntry(val text: String, val icon: Icon? = null)
 
 /**
  * A row of mutually exclusive views to switch between (`SelectorBar`), controlled by [selectedIndex]
@@ -16,7 +14,7 @@ data class SelectorBarEntry(val text: String, val icon: Symbol? = null)
  * selected index below the bar.
  *
  * ```
- * SelectorBar(listOf(SelectorBarEntry("Recent", Symbol.Clock), SelectorBarEntry("Shared")), selectedIndex = view, onSelectedIndexChange = { view = it })
+ * SelectorBar(listOf(SelectorBarEntry("Recent", Icon.Symbol(Symbol.Clock)), SelectorBarEntry("Shared")), selectedIndex = view, onSelectedIndexChange = { view = it })
  * ```
  */
 @Composable
@@ -54,7 +52,7 @@ internal class SelectorBarNode(private val bar: XamlSelectorBar) : ElementNode<X
             for (entry in items) {
                 val item = XamlSelectorBarItem()
                 item.Text = entry.text
-                if (entry.icon != null) item.Icon = SymbolIcon(entry.icon)
+                if (entry.icon != null) item.Icon = entry.icon.toIconElement()
                 bar.Items.Add(item)
             }
         }

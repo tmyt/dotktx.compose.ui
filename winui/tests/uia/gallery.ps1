@@ -254,6 +254,28 @@ Check 'star kept after removals' 'On' { Star 2 }
 Check 'Grid cell' 'Grid cell 0,1' { $win.FindFirst($Scope::Descendants, (Cond $A::NameProperty 'Grid cell 0,1')).Current.Name }
 Check 'semantics name' 'bordered text' { $win.FindFirst($Scope::Descendants, (Cond $A::NameProperty 'bordered text')).Current.Name }
 
+# Modifier.padding, in effective pixels. TextBlock has no padding of its own, so its height grows by
+# exactly top + bottom; the Button returns to its style's padding when the modifier goes away; the
+# panel's top padding moves its child down relative to the Button above it.
+# The padding examples sit at the end of the gallery; elements outside the viewport report no bounds,
+# so every measurement first scrolls the gallery to its end.
+$galleryScroll = Pattern (Find-Id $win 'galleryScroll') ([System.Windows.Automation.ScrollPattern])
+function Rect($id) {
+  $galleryScroll.SetScrollPercent([System.Windows.Automation.ScrollPattern]::NoScroll, 100)
+  Start-Sleep -Milliseconds 100
+  (Find-Id $win $id).Current.BoundingRectangle
+}
+function Dip($value) { [Math]::Round($value / $scale) }
+$padToggle = Pattern (Find-Id $win 'padToggle') ([System.Windows.Automation.TogglePattern])
+$text0 = Rect 'padText'; $button0 = Rect 'padButton'; $child0 = Rect 'padPanelChild'
+$padToggle.Toggle()
+Check 'padding grows TextBlock by top + bottom' 48 { Dip ((Rect 'padText').Height - $text0.Height) }
+Check 'padding replaces the Button style padding' 'True' { [string]((Rect 'padButton').Height -gt $button0.Height + 20 * $scale) }
+Check 'panel padding moves its child' 24 { Dip (((Rect 'padPanelChild').Y - (Rect 'padButton').Bottom) - ($child0.Y - $button0.Bottom)) }
+$padToggle.Toggle()
+Check 'removing padding restores TextBlock' 'near' { Near (Rect 'padText').Height $text0.Height }
+Check 'removing padding restores the Button style padding' 'near' { Near (Rect 'padButton').Height $button0.Height }
+
 # A second window opens from state and closes through onCloseRequest.
 (Pattern (Find-Id $win 'openSettings') ([System.Windows.Automation.InvokePattern])).Invoke()
 $settings = Find-Window 'Settings' 10

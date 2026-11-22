@@ -5,12 +5,10 @@ import androidx.compose.runtime.currentRecomposeScope
 import Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible
 import Microsoft.UI.Xaml.Controls.NavigationViewItem
 import Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode
-import Microsoft.UI.Xaml.Controls.Symbol
-import Microsoft.UI.Xaml.Controls.SymbolIcon
 import Microsoft.UI.Xaml.Controls.NavigationView as XamlNavigationView
 
 /** One entry of a [NavigationView] menu. [key] identifies it in `selectedKey` and `onSelect`. */
-data class NavigationItem(val key: String, val label: String, val icon: Symbol? = null)
+data class NavigationItem(val key: String, val label: String, val icon: Icon? = null)
 
 /**
  * The top-level navigation of an app (`NavigationView`): a menu of [items] and a content area.
@@ -97,7 +95,7 @@ internal class NavigationViewNode(private val view: XamlNavigationView) :
                 val entry = NavigationViewItem()
                 entry.Content = item.label
                 entry.Tag = item.key
-                if (item.icon != null) entry.Icon = SymbolIcon(item.icon)
+                if (item.icon != null) entry.Icon = item.icon.toIconElement()
                 view.MenuItems.Add(entry)
                 itemsByKey[item.key] = entry
             }

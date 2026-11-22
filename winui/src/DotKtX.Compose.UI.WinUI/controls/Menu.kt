@@ -8,8 +8,6 @@ import Microsoft.UI.Xaml.Controls.MenuFlyoutItem
 import Microsoft.UI.Xaml.Controls.MenuFlyoutItemBase
 import Microsoft.UI.Xaml.Controls.MenuFlyoutSeparator
 import Microsoft.UI.Xaml.Controls.MenuFlyoutSubItem
-import Microsoft.UI.Xaml.Controls.Symbol
-import Microsoft.UI.Xaml.Controls.SymbolIcon
 import Microsoft.UI.Xaml.Controls.ToggleMenuFlyoutItem
 import System.Collections.Generic.IList
 import Microsoft.UI.Xaml.Controls.DropDownButton as XamlDropDownButton
@@ -19,7 +17,7 @@ sealed class MenuEntry {
     /** A command. */
     data class Item(
         val text: String,
-        val icon: Symbol? = null,
+        val icon: Icon? = null,
         val enabled: Boolean = true,
         val onClick: () -> Unit,
     ) : MenuEntry()
@@ -33,7 +31,7 @@ sealed class MenuEntry {
     ) : MenuEntry()
 
     /** A nested menu. */
-    data class SubMenu(val text: String, val entries: List<MenuEntry>, val icon: Symbol? = null) : MenuEntry()
+    data class SubMenu(val text: String, val entries: List<MenuEntry>, val icon: Icon? = null) : MenuEntry()
 
     /** A dividing line. */
     object Separator : MenuEntry()
@@ -44,9 +42,9 @@ sealed class MenuEntry {
  *
  * ```
  * TextBlock(note.title, Modifier.contextMenu(listOf(
- *     MenuEntry.Item("Rename", Symbol.Rename) { renaming = note },
+ *     MenuEntry.Item("Rename", Icon.Symbol(Symbol.Rename)) { renaming = note },
  *     MenuEntry.Separator,
- *     MenuEntry.Item("Delete", Symbol.Delete) { notes.remove(note) },
+ *     MenuEntry.Item("Delete", Icon.Symbol(Symbol.Delete)) { notes.remove(note) },
  * )))
  * ```
  */
@@ -112,7 +110,7 @@ private fun menuItem(entry: MenuEntry): MenuFlyoutItemBase = when (entry) {
     is MenuEntry.Item -> MenuFlyoutItem().also { item ->
         item.Text = entry.text
         item.IsEnabled = entry.enabled
-        if (entry.icon != null) item.Icon = SymbolIcon(entry.icon)
+        if (entry.icon != null) item.Icon = entry.icon.toIconElement()
         item.Click.subscribe { _, _ -> entry.onClick() }
     }
     is MenuEntry.Toggle -> ToggleMenuFlyoutItem().also { item ->
@@ -128,7 +126,7 @@ private fun menuItem(entry: MenuEntry): MenuFlyoutItemBase = when (entry) {
     }
     is MenuEntry.SubMenu -> MenuFlyoutSubItem().also { item ->
         item.Text = entry.text
-        if (entry.icon != null) item.Icon = SymbolIcon(entry.icon)
+        if (entry.icon != null) item.Icon = entry.icon.toIconElement()
         fillMenuItems(item.Items, entry.entries)
     }
     MenuEntry.Separator -> MenuFlyoutSeparator()

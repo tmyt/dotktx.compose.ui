@@ -8,8 +8,6 @@ import Microsoft.UI.Xaml.Controls.AppBarSeparator
 import Microsoft.UI.Xaml.Controls.AppBarToggleButton
 import Microsoft.UI.Xaml.Controls.CommandBarDefaultLabelPosition
 import Microsoft.UI.Xaml.Controls.ICommandBarElement
-import Microsoft.UI.Xaml.Controls.Symbol
-import Microsoft.UI.Xaml.Controls.SymbolIcon
 import System.Collections.Generic.IList
 import Microsoft.UI.Xaml.Controls.CommandBar as XamlCommandBar
 
@@ -18,7 +16,7 @@ sealed class CommandBarEntry {
     /** A command button (`AppBarButton`). */
     data class Button(
         val label: String,
-        val icon: Symbol? = null,
+        val icon: Icon? = null,
         val enabled: Boolean = true,
         val onClick: () -> Unit,
     ) : CommandBarEntry()
@@ -26,7 +24,7 @@ sealed class CommandBarEntry {
     /** An on/off button (`AppBarToggleButton`), controlled by [checked]. */
     data class Toggle(
         val label: String,
-        val icon: Symbol? = null,
+        val icon: Icon? = null,
         val checked: Boolean,
         val enabled: Boolean = true,
         val onCheckedChange: (Boolean) -> Unit,
@@ -52,11 +50,11 @@ sealed class CommandBarEntry {
  * ```
  * CommandBar(
  *     listOf(
- *         CommandBarEntry.Button("Save", Symbol.Save) { save() },
+ *         CommandBarEntry.Button("Save", Icon.Symbol(Symbol.Save)) { save() },
  *         CommandBarEntry.Separator,
- *         CommandBarEntry.Toggle("Bold", Symbol.Bold, checked = bold) { bold = it },
+ *         CommandBarEntry.Toggle("Bold", Icon.Symbol(Symbol.Bold), checked = bold) { bold = it },
  *     ),
- *     secondaryCommands = listOf(CommandBarEntry.Button("Settings", Symbol.Setting) { showSettings = true }),
+ *     secondaryCommands = listOf(CommandBarEntry.Button("Settings", Icon.Symbol(Symbol.Setting)) { showSettings = true }),
  * ) { TextBlock(fileName) }
  * ```
  */
@@ -184,7 +182,7 @@ private class ButtonCommand : BarCommand() {
         val previous = last
         if (previous == null || previous.label != e.label) button.Label = e.label
         if (previous == null || previous.icon != e.icon) {
-            if (e.icon == null) button.ClearValue(AppBarButton.IconProperty) else button.Icon = SymbolIcon(e.icon)
+            if (e.icon == null) button.ClearValue(AppBarButton.IconProperty) else button.Icon = e.icon.toIconElement()
         }
         if (previous == null || previous.enabled != e.enabled) button.IsEnabled = e.enabled
         last = e
@@ -212,7 +210,7 @@ private class ToggleCommand : BarCommand() {
         val previous = last
         if (previous == null || previous.label != e.label) button.Label = e.label
         if (previous == null || previous.icon != e.icon) {
-            if (e.icon == null) button.ClearValue(AppBarToggleButton.IconProperty) else button.Icon = SymbolIcon(e.icon)
+            if (e.icon == null) button.ClearValue(AppBarToggleButton.IconProperty) else button.Icon = e.icon.toIconElement()
         }
         if (previous == null || previous.enabled != e.enabled) button.IsEnabled = e.enabled
         input.sync(e.checked)

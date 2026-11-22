@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import dotktx.compose.ui.winui.Icon
 import dotktx.compose.ui.winui.Button
 import dotktx.compose.ui.winui.CalendarDatePicker
 import dotktx.compose.ui.winui.CalendarView
@@ -24,8 +25,6 @@ import dotktx.compose.ui.winui.Viewbox
 import dotktx.compose.ui.winui.Window
 import dotktx.compose.ui.winui.application
 import dotktx.compose.ui.winui.RelativePanel
-import dotktx.compose.ui.winui.canvasPosition
-import dotktx.compose.ui.winui.gridCell
 import dotktx.compose.ui.winui.margin
 import dotktx.compose.ui.winui.rememberWindowState
 import dotktx.compose.ui.winui.size
@@ -48,11 +47,11 @@ private fun formatTime(time: TimeSpan?): String =
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "Pickers", state = rememberWindowState(width = 1100.0, height = 900.0)) {
         Grid(Modifier.margin(16.0), columns = listOf(GridSize.Star(), GridSize.Star()), columnSpacing = 24.0) {
-            StackPanel(Modifier.gridCell(0, 0), spacing = 8.0) {
+            StackPanel(Modifier.cell(0, 0), spacing = 8.0) {
                 DateAndTime()
                 Calendars()
             }
-            StackPanel(Modifier.gridCell(0, 1), spacing = 8.0) {
+            StackPanel(Modifier.cell(0, 1), spacing = 8.0) {
                 Badges()
                 Pager()
                 Layouts()
@@ -133,7 +132,7 @@ private fun Badges() {
     StackPanel(orientation = Orientation.Horizontal, spacing = 12.0) {
         // InfoBadge has no automation peer of its own; the buttons let the test find each badge's text.
         Button({}, Modifier.testTag("badgeValue")) { InfoBadge(value = count) }
-        Button({}, Modifier.testTag("badgeIcon")) { InfoBadge(icon = Symbol.Important) }
+        Button({}, Modifier.testTag("badgeIcon")) { InfoBadge(icon = Icon.Symbol(Symbol.Important)) }
         Button({}, Modifier.testTag("badgeDot")) { InfoBadge() }
         PersonPicture("Ann Lee", Modifier.size(48.0, 48.0).testTag("person"), badgeNumber = count)
         PersonPicture("Bob Stone", Modifier.size(48.0, 48.0).testTag("personInitials"), initials = "BS")
@@ -167,7 +166,7 @@ private fun Layouts() {
     }
 
     Canvas(Modifier.size(300.0, 60.0).testTag("canvas")) {
-        TextBlock("Marker", Modifier.canvasPosition(left, 20.0).testTag("marker"))
+        TextBlock("Marker", Modifier.position(left, 20.0).testTag("marker"))
         TextBlock("Origin", Modifier.testTag("origin"))
     }
     TextBlock("left=${left.toInt()}", Modifier.testTag("leftEcho"))

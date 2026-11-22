@@ -3,8 +3,6 @@ package dotktx.compose.ui.winui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
-import Microsoft.UI.Xaml.Controls.Symbol
-import Microsoft.UI.Xaml.Controls.SymbolIconSource
 import Microsoft.UI.Xaml.Controls.TitleBar as XamlTitleBar
 
 /**
@@ -18,8 +16,8 @@ import Microsoft.UI.Xaml.Controls.TitleBar as XamlTitleBar
  *
  * ```
  * Grid(rows = listOf(GridSize.Auto, GridSize.Star())) {
- *     TitleBar("Notes", Modifier.gridCell(0, 0), onBack = if (canGoBack) ::goBack else null)
- *     Page(Modifier.gridCell(1, 0))
+ *     TitleBar("Notes", Modifier.cell(0, 0), onBack = if (canGoBack) ::goBack else null)
+ *     Page(Modifier.cell(1, 0))
  * }
  * ```
  */
@@ -28,7 +26,7 @@ fun TitleBar(
     title: String,
     modifier: Modifier = Modifier,
     subtitle: String = "",
-    icon: Symbol? = null,
+    icon: Icon? = null,
     onBack: (() -> Unit)? = null,
     onPaneToggle: (() -> Unit)? = null,
     content: @Composable () -> Unit = {},
@@ -39,7 +37,7 @@ fun TitleBar(
     Container({ TitleBarNode(bar) }, modifier, {
         set(title) { element.Title = it }
         set(subtitle) { element.Subtitle = it }
-        set(icon) { element.IconSource = if (it == null) null else SymbolIconSource().also { source -> source.Symbol = it } }
+        set(icon) { element.IconSource = it?.toIconSource() }
         set(onBack) {
             this.onBack = it
             element.IsBackButtonVisible = it != null

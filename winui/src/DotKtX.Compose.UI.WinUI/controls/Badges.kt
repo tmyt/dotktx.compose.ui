@@ -1,8 +1,6 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
-import Microsoft.UI.Xaml.Controls.Symbol
-import Microsoft.UI.Xaml.Controls.SymbolIconSource
 import Microsoft.UI.Xaml.Controls.InfoBadge as XamlInfoBadge
 import Microsoft.UI.Xaml.Controls.PersonPicture as XamlPersonPicture
 
@@ -13,26 +11,18 @@ import Microsoft.UI.Xaml.Controls.PersonPicture as XamlPersonPicture
  *
  * ```
  * InfoBadge(value = unread.takeIf { it > 0 })
- * InfoBadge(icon = Symbol.Important)
+ * InfoBadge(icon = Icon.Symbol(Symbol.Important))
  * ```
  */
 @Composable
 fun InfoBadge(
     modifier: Modifier = Modifier,
     value: Int? = null,
-    icon: Symbol? = null,
+    icon: Icon? = null,
 ) {
     Leaf({ ElementNode(XamlInfoBadge(), ChildSlot.None("InfoBadge")) }, modifier) {
         set(value) { if (it == null) element.ClearValue(XamlInfoBadge.ValueProperty) else element.Value = it }
-        set(icon) {
-            if (it == null) {
-                element.ClearValue(XamlInfoBadge.IconSourceProperty)
-            } else {
-                val source = SymbolIconSource()
-                source.Symbol = it
-                element.IconSource = source
-            }
-        }
+        set(icon) { if (it == null) element.ClearValue(XamlInfoBadge.IconSourceProperty) else element.IconSource = it.toIconSource() }
     }
 }
 

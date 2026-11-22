@@ -36,14 +36,15 @@ Windows and pass their UI Automation tests.
 | Inputs | `TextBox`, `PasswordBox`, `NumberBox`, `AutoSuggestBox`, `RichEditBox` (uncontrolled), `CheckBox`, `RadioButton`, `ToggleSwitch`, `Slider`, `ComboBox`, `RatingControl`, `ColorPicker` |
 | Dates and times | `DatePicker`, `TimePicker`, `CalendarDatePicker`, `CalendarView` |
 | Status | `ProgressBar`, `ProgressRing`, `InfoBar`, `InfoBadge`, `PersonPicture`, `Image` |
-| Layout | `StackPanel`, `Grid`, `Border`, `ScrollViewer`, `Viewbox`, `Canvas`, `RelativePanel` (the XAML counterpart of `ConstraintLayout`: `createRefs()` and `Modifier.relative(ref) { below(title) }`), `SplitView`, `Expander` |
+| Layout | `StackPanel`, `Grid` (children take `Modifier.cell(row, column)`), `Border`, `ScrollViewer`, `Viewbox`, `Canvas` (children take `Modifier.position(left, top)`), `RelativePanel` (the XAML counterpart of `ConstraintLayout`: `createRefs()` and `Modifier.relative(ref) { below(title) }`), `SplitView`, `Expander` |
 | Collections | `LazyItems` (virtualized over `ItemsRepeater`), `ListView`, `GridView` (single, multiple or no selection), `TreeView`, `FlipView`, `PipsPager`; optional keys keep per-item state |
 | Navigation | `TitleBar`, `NavigationView`, `TabView`, `BreadcrumbBar`, `SelectorBar` |
 | Commands and menus | `CommandBar` (`CommandBarEntry`), `MenuBar` (`MenuBarMenu`), `MenuEntry`, `Modifier.contextMenu` |
 | Popups | `Flyout`, `TeachingTip`, anchored with `rememberPopupAnchor` and `Modifier.popupAnchor` |
 | Web | `WebView2` |
 | Interop | `WinUIElement` (any other control) |
-| Modifiers | `align`, `margin`, `width`, `height`, `size`, `widthIn`, `heightIn`, `alpha`, `gridCell`, `canvasPosition`, `toolTip`, `semantics`, `testTag`, `requestedTheme`, `contextMenu`, `popupAnchor`, `property` |
+| Icons | `Icon`: `Symbol`, `Glyph` (font glyph), `Bitmap`, `Image`, `Source` (any WinUI `IconSource`), taken by every icon parameter |
+| Modifiers | `align`, `margin`, `padding`, `width`, `height`, `size`, `widthIn`, `heightIn`, `alpha`, `toolTip`, `semantics`, `testTag`, `requestedTheme`, `contextMenu`, `popupAnchor`, `property` |
 | Locals | `LocalWindow`, `LocalDispatcherQueue` |
 
 Inputs are controlled: the composition's value is the source of truth, and an edit the application
@@ -98,7 +99,7 @@ A complete application project:
     <StartupObject>MainKt</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DotKtX.Compose.UI.WinUI" Version="0.2.1" />
+    <PackageReference Include="DotKtX.Compose.UI.WinUI" Version="0.3.0" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
   </ItemGroup>
 </Project>

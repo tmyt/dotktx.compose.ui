@@ -3,8 +3,6 @@ package dotktx.compose.ui.winui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
 import Microsoft.UI.Xaml.Controls.AutoSuggestionBoxTextChangeReason
-import Microsoft.UI.Xaml.Controls.Symbol
-import Microsoft.UI.Xaml.Controls.SymbolIcon
 import System.Collections.Generic.List as ClrList
 import Microsoft.UI.Xaml.Controls.AutoSuggestBox as XamlAutoSuggestBox
 
@@ -31,7 +29,7 @@ import Microsoft.UI.Xaml.Controls.AutoSuggestBox as XamlAutoSuggestBox
  *     onSuggestionChosen = { query = it },
  *     onQuerySubmitted = { typed, suggestion -> search(suggestion ?: typed) },
  *     placeholder = "Search fruit",
- *     queryIcon = Symbol.Find,
+ *     queryIcon = Icon.Symbol(Symbol.Find),
  * )
  * ```
  */
@@ -45,7 +43,7 @@ fun AutoSuggestBox(
     onQuerySubmitted: (query: String, suggestion: String?) -> Unit = { _, _ -> },
     enabled: Boolean = true,
     placeholder: String = "",
-    queryIcon: Symbol? = null,
+    queryIcon: Icon? = null,
 ) {
     val scope = currentRecomposeScope
     Leaf({ AutoSuggestBoxNode(XamlAutoSuggestBox()) }, modifier) {
@@ -55,7 +53,7 @@ fun AutoSuggestBox(
         set(onQuerySubmitted) { this.onQuerySubmitted = it }
         set(enabled) { element.IsEnabled = it }
         set(placeholder) { element.PlaceholderText = it }
-        set(queryIcon) { if (it == null) element.ClearValue(XamlAutoSuggestBox.QueryIconProperty) else element.QueryIcon = SymbolIcon(it) }
+        set(queryIcon) { if (it == null) element.ClearValue(XamlAutoSuggestBox.QueryIconProperty) else element.QueryIcon = it.toIconElement() }
         // A new ItemsSource, not edits of Items: the box opens its list for a new source, while
         // changes made through Items leave it closed.
         set(suggestions) { list ->

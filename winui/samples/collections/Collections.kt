@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import dotktx.compose.ui.winui.Icon
 import dotktx.compose.ui.winui.BreadcrumbBar
 import dotktx.compose.ui.winui.Button
 import dotktx.compose.ui.winui.CheckBox
@@ -23,7 +24,6 @@ import dotktx.compose.ui.winui.TreeView
 import dotktx.compose.ui.winui.Window
 import dotktx.compose.ui.winui.WindowPosition
 import dotktx.compose.ui.winui.application
-import dotktx.compose.ui.winui.gridCell
 import dotktx.compose.ui.winui.height
 import dotktx.compose.ui.winui.margin
 import dotktx.compose.ui.winui.rememberWindowState
@@ -37,7 +37,7 @@ fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "Collections", state = state) {
         ScrollViewer {
             Grid(Modifier.margin(24.0), columns = listOf(GridSize.Star(), GridSize.Star()), columnSpacing = 24.0) {
-                StackPanel(Modifier.gridCell(0, 0), spacing = 8.0) {
+                StackPanel(Modifier.cell(0, 0), spacing = 8.0) {
                     TextBlock("ListView", fontSize = 20.0)
                     Fruits()
                     TextBlock("ListView, multiple selection", fontSize = 20.0)
@@ -45,7 +45,7 @@ fun main() = application {
                     TextBlock("GridView", fontSize = 20.0)
                     Colors()
                 }
-                StackPanel(Modifier.gridCell(0, 1), spacing = 8.0) {
+                StackPanel(Modifier.cell(0, 1), spacing = 8.0) {
                     TextBlock("TreeView", fontSize = 20.0)
                     Folders()
                     TextBlock("FlipView", fontSize = 20.0)
@@ -168,7 +168,7 @@ private fun Breadcrumbs() {
 @Composable
 private fun Selector() {
     val entries = remember {
-        listOf(SelectorBarEntry("Recent", Symbol.Clock), SelectorBarEntry("Shared", Symbol.People), SelectorBarEntry("Favorites", Symbol.Favorite))
+        listOf(SelectorBarEntry("Recent", Icon.Symbol(Symbol.Clock)), SelectorBarEntry("Shared", Icon.Symbol(Symbol.People)), SelectorBarEntry("Favorites", Icon.Symbol(Symbol.Favorite)))
     }
     var view by remember { mutableIntStateOf(0) }
     Button({ view = 2 }, Modifier.testTag("selectFavorites")) { TextBlock("Show favorites") }

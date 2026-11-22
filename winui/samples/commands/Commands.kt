@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import dotktx.compose.ui.winui.Icon
 import dotktx.compose.ui.winui.Button
 import dotktx.compose.ui.winui.CheckBox
 import dotktx.compose.ui.winui.CommandBar
@@ -23,7 +24,6 @@ import dotktx.compose.ui.winui.TextBox
 import dotktx.compose.ui.winui.WebView2
 import dotktx.compose.ui.winui.Window
 import dotktx.compose.ui.winui.application
-import dotktx.compose.ui.winui.gridCell
 import dotktx.compose.ui.winui.height
 import dotktx.compose.ui.winui.margin
 import dotktx.compose.ui.winui.popupAnchor
@@ -32,6 +32,7 @@ import dotktx.compose.ui.winui.rememberWindowState
 import dotktx.compose.ui.winui.testTag
 import Microsoft.UI.Xaml.Controls.CommandBarDefaultLabelPosition
 import Microsoft.UI.Xaml.Controls.Orientation
+import Microsoft.UI.Xaml.Controls.FontIconSource
 import Microsoft.UI.Xaml.Controls.Symbol
 import Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode
 
@@ -45,9 +46,9 @@ fun main() {
     application {
         Window(onCloseRequest = ::exitApplication, title = "Commands", state = rememberWindowState(width = 960.0, height = 900.0)) {
             Grid(rows = listOf(GridSize.Auto, GridSize.Auto, GridSize.Star())) {
-                Menus(Modifier.gridCell(0, 0))
-                Commands(Modifier.gridCell(1, 0))
-                ScrollViewer(Modifier.gridCell(2, 0)) {
+                Menus(Modifier.cell(0, 0))
+                Commands(Modifier.cell(1, 0))
+                ScrollViewer(Modifier.cell(2, 0)) {
                     StackPanel(Modifier.margin(16.0), spacing = 16.0) {
                         Popups()
                         Browser()
@@ -66,7 +67,7 @@ private fun Menus(modifier: Modifier) {
         MenuBar(
             listOf(
                 MenuBarMenu("File", listOf(
-                    MenuEntry.Item("New", Symbol.Add) { last = "new" },
+                    MenuEntry.Item("New", Icon.Symbol(Symbol.Add)) { last = "new" },
                     MenuEntry.Separator,
                     MenuEntry.SubMenu("Export", listOf(MenuEntry.Item("PDF") { last = "export:pdf" })),
                 )),
@@ -89,18 +90,20 @@ private fun Commands(modifier: Modifier) {
     var wrap by remember { mutableStateOf(false) }
     var barOpen by remember { mutableStateOf(false) }
     var rejected by remember { mutableIntStateOf(0) }
+    // Any WinUI icon source works through Icon.Source; remembered, so the icon stays equal.
+    val pinIcon = remember { FontIconSource().also { it.Glyph = "\uE718" } }
     StackPanel(modifier) {
         CommandBar(
             listOf(
-                CommandBarEntry.Button("Save", Symbol.Save) { last = "save" },
+                CommandBarEntry.Button("Save", Icon.Symbol(Symbol.Save)) { last = "save" },
                 CommandBarEntry.Separator,
-                CommandBarEntry.Toggle("Bold", Symbol.Bold, checked = bold) { bold = it },
+                CommandBarEntry.Toggle("Bold", Icon.Symbol(Symbol.Bold), checked = bold) { bold = it },
                 // Never accepted: the button must return to the composed value.
-                CommandBarEntry.Toggle("Pin", Symbol.Pin, checked = false) { rejected++ },
+                CommandBarEntry.Toggle("Pin", Icon.Source(pinIcon), checked = false) { rejected++ },
             ),
             Modifier.testTag("commandBar"),
             secondaryCommands = listOf(
-                CommandBarEntry.Button("Settings", Symbol.Setting) { last = "settings" },
+                CommandBarEntry.Button("Settings", Icon.Glyph("\uE713")) { last = "settings" },
                 CommandBarEntry.Toggle("Wrap", checked = wrap) { wrap = it },
             ),
             isOpen = barOpen,

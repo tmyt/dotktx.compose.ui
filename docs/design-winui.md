@@ -321,7 +321,7 @@ Compose separates **what an element is** (parameters) from **cross-cutting decor
 
 | Parameters of the composable | `Modifier` |
 |---|---|
-| Control-specific properties: `TextBlock(text)`, `Button(onClick, enabled)`, `StackPanel(orientation, spacing)` | Properties that every `FrameworkElement` has: alignment, margin, size and its bounds, opacity, `Grid` cell (attached properties), tooltip, automation name and ID, requested theme, context menu |
+| Control-specific properties: `TextBlock(text)`, `Button(onClick, enabled)`, `StackPanel(orientation, spacing)` | Layout and decoration properties: alignment, margin, padding, size and its bounds, opacity, tooltip, automation name and ID, requested theme, context menu |
 
 ### 5.1 Chain
 
@@ -370,15 +370,32 @@ Modifier.property(Control.FontSizeProperty, 24.0)     // SetValue / ClearValue
 |---|---|
 | `align(Alignment)` | `HorizontalAlignment` and `VerticalAlignment` (`Alignment.Center`, `TopStart`, …, `Stretch`) |
 | `margin(all)`, `margin(horizontal, vertical)`, `margin(start, top, end, bottom)` | `Margin` |
+| `padding(all)`, `padding(horizontal, vertical)`, `padding(start, top, end, bottom)` | The element type's `Padding` (see below) |
 | `width`, `height`, `size`, `widthIn(min, max)`, `heightIn(min, max)` | `Width`, `Height`, `Min*`, `Max*` (`NaN` leaves a bound unset) |
 | `alpha` | `Opacity` |
-| `gridCell(row, column, rowSpan, columnSpan)` | `Grid.SetRow`, … (attached properties) |
 | `toolTip(text)` | `ToolTipService.SetToolTip` |
 | `semantics(name)` | `AutomationProperties.SetName` |
 | `testTag(tag)` | `AutomationProperties.SetAutomationId` (for finding elements in UI tests) |
 | `requestedTheme(theme)` | `RequestedTheme` |
 | `contextMenu(entries)` | `UIElement.ContextFlyout` (§6.4) |
 | `property(dp, value)` | Any dependency property |
+
+Modifiers that only mean something to one kind of parent are members of that parent's content
+scope, the way Compose's `weight` belongs to `RowScope`. Outside the parent they do not compile:
+
+| Scope | Modifier | WinUI |
+|---|---|---|
+| `GridScope` | `cell(row, column, rowSpan, columnSpan)` | `Grid.Row`, `Grid.Column`, `Grid.RowSpan`, `Grid.ColumnSpan` |
+| `CanvasScope` | `position(left, top, zIndex)` | `Canvas.Left`, `Canvas.Top`, `Canvas.ZIndex` |
+| `RelativePanelScope` | `relative(ref) { … }` | `RelativePanel.Below`, … (below) |
+
+The scopes carry `@LayoutScopeMarker`, a `@DslMarker` like Compose's. Inside another scoped
+layout's content the outer scope is not an implicit receiver, so a child of a `Canvas` inside a
+`Grid` cannot take `cell`, which neither panel would use. Content lambdas without a receiver
+(`StackPanel`, `Border`, a `Button`'s content) do not hide the outer scope, the same as a plain
+`@Composable () -> Unit` lambda inside a Compose `Row`. DotKt does not yet enforce the marker across
+assemblies (tmyt/dotkt#1821), so in applications only the scope itself is checked: `cell` outside
+any `Grid` content does not compile.
 
 Children of a `RelativePanel` are placed against each other, the way Compose's `ConstraintLayout`
 does it. References come from `createRefs()` in the panel's scope, and `Modifier.relative(ref) { … }`
@@ -397,8 +414,18 @@ the target's **name**. The panel resolves names among its children during layout
 not depend on the order in which children are emitted, and Compose never needs another node's
 element. A constraint that leaves the chain is cleared like any other modifier value.
 
-There is no `padding` modifier. In WinUI, padding belongs to `Control`, `Border` and some panels, so
-it is a parameter of those composables.
+Padding is a modifier, like margin, although WinUI does not define it on `FrameworkElement`.
+`Control`, `Border`, `StackPanel`, `Grid`, `RelativePanel`, `TextBlock`, `RichTextBlock`,
+`ContentPresenter` and `ItemsPresenter` each define their own `Padding`, and the modifier picks the
+property from the element's type. Elements without content to pad (`Image`, `Canvas`, `Viewbox`,
+shapes) have none; on them the modifier has no effect and prints a warning once per element type.
+
+The alternative, a `padding` parameter on each composable that has the property, would be checked
+by the compiler but would make padding the one layout property that is not a modifier. A modifier
+cannot be checked against the element's type, because `Modifier` does not know which element it is
+applied to. Unlike Compose's `padding`, the modifier does not depend on its position in the chain:
+it sets a property of the element, as `margin` does. Making it order-dependent would need a wrapper
+element, which would move attached properties and automation IDs off the element itself.
 
 ## 6. Wrapper composables
 
@@ -490,7 +517,27 @@ change. After a toggle item reports a click, it shows its entry's value again: a
 arrives as new entries, and a rejected one does not stay checked. `CommandBar` describes its commands
 the same way (`CommandBarEntry`), and its toggles follow the composed value through `ControlledValue`.
 
-### 6.5 Naming
+### 6.5 Icons
+
+Every icon parameter (`TitleBar`, `InfoBadge`, `AutoSuggestBox`, `NavigationItem`, `SelectorBarEntry`,
+`MenuEntry`, `CommandBarEntry`) takes `Icon`, an immutable value:
+
+| `Icon` | WinUI |
+|---|---|
+| `Symbol(symbol)` | `SymbolIcon` / `SymbolIconSource` |
+| `Glyph(glyph, fontFamily)` | `FontIcon` / `FontIconSource` |
+| `Bitmap(uri, monochrome)` | `BitmapIcon` / `BitmapIconSource` |
+| `Image(uri)` | `ImageIcon` / `ImageIconSource` |
+| `Source(iconSource)` | any `IconSource`, shown through `IconSourceElement` where an element is needed |
+
+WinUI has two forms of an icon. An `IconElement` is part of the visual tree, so it can have only one
+parent; an `IconSource` describes an icon and can be shared. Some properties take one form
+(`MenuFlyoutItem.Icon`), some the other (`TitleBar.IconSource`). A value type that converts to
+either form, with a fresh element each time, hides the difference and compares by value, so an
+unchanged icon is not applied again on recomposition. `Source` keeps every other icon reachable; it
+compares by the source object, so the source is created once with `remember`.
+
+### 6.6 Naming
 
 Wrapper composables use **WinUI names** (`TextBlock`, `StackPanel`, `Grid`, `Border`,
 `ToggleSwitch`, `NavigationView`). Parameters use Compose conventions: `onClick`, `onTextChange`,

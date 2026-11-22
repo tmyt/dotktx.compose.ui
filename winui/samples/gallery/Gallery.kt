@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import dotktx.compose.ui.winui.Icon
 import dotktx.compose.ui.winui.Alignment
 import dotktx.compose.ui.winui.Border
 import dotktx.compose.ui.winui.Button
@@ -27,7 +28,7 @@ import dotktx.compose.ui.winui.RadioButton
 import dotktx.compose.ui.winui.Severity
 import dotktx.compose.ui.winui.GridSize
 import dotktx.compose.ui.winui.Modifier
-import dotktx.compose.ui.winui.Padding
+import dotktx.compose.ui.winui.Canvas
 import dotktx.compose.ui.winui.ProgressBar
 import dotktx.compose.ui.winui.ScrollViewer
 import dotktx.compose.ui.winui.Slider
@@ -42,9 +43,10 @@ import dotktx.compose.ui.winui.WindowState
 import dotktx.compose.ui.winui.rememberWindowState
 import dotktx.compose.ui.winui.align
 import dotktx.compose.ui.winui.application
-import dotktx.compose.ui.winui.gridCell
 import dotktx.compose.ui.winui.height
 import dotktx.compose.ui.winui.margin
+import dotktx.compose.ui.winui.padding
+import dotktx.compose.ui.winui.size
 import dotktx.compose.ui.winui.semantics
 import dotktx.compose.ui.winui.testTag
 import dotktx.compose.ui.winui.toolTip
@@ -59,7 +61,7 @@ fun main() = application {
     var showSettings by remember { mutableStateOf(false) }
     val mainWindow = rememberWindowState(width = 720.0, height = 640.0, position = WindowPosition.Center)
     Window(onCloseRequest = ::exitApplication, title = "Gallery", state = mainWindow) {
-        ScrollViewer {
+        ScrollViewer(Modifier.testTag("galleryScroll")) {
             StackPanel(Modifier.margin(24.0), spacing = 12.0) {
                 TextBlock("Window", fontSize = 20.0)
                 WindowControls(mainWindow)
@@ -176,7 +178,7 @@ private fun Menus() {
     var action by remember { mutableStateOf("none") }
     var wrap by remember { mutableStateOf(false) }
     val menu = listOf(
-        MenuEntry.Item("Copy", Symbol.Copy) { action = "copy" },
+        MenuEntry.Item("Copy", Icon.Symbol(Symbol.Copy)) { action = "copy" },
         MenuEntry.Toggle("Word wrap", wrap) { wrap = it },
         MenuEntry.Separator,
         MenuEntry.SubMenu("Export", listOf(MenuEntry.Item("PNG") { action = "export:png" }, MenuEntry.Item("SVG") { action = "export:svg" })),
@@ -285,11 +287,20 @@ private fun Layout() {
         rowSpacing = 4.0,
         columnSpacing = 8.0,
     ) {
-        TextBlock("Row 0", Modifier.gridCell(0, 0))
-        TextBlock("Grid cell 0,1", Modifier.gridCell(0, 1))
-        TextBlock("Row 1", Modifier.gridCell(1, 0))
-        Border(Modifier.gridCell(1, 1), padding = Padding(8.0), borderBrush = outline, borderThickness = 1.0, cornerRadius = 4.0) {
+        TextBlock("Row 0", Modifier.cell(0, 0))
+        TextBlock("Grid cell 0,1", Modifier.cell(0, 1))
+        TextBlock("Row 1", Modifier.cell(1, 0))
+        Border(Modifier.cell(1, 1).padding(8.0), borderBrush = outline, borderThickness = 1.0, cornerRadius = 4.0) {
             TextBlock("In a border", Modifier.toolTip("A tooltip").semantics("bordered text"))
         }
     }
+    // Padding on a TextBlock (no padding in its style), a control (padding from its style) and a panel.
+    var padded by remember { mutableStateOf(false) }
+    CheckBox(padded, { padded = it }, Modifier.testTag("padToggle")) { TextBlock("Padding 24") }
+    val pad = if (padded) Modifier.padding(24.0) else Modifier
+    TextBlock("Padded text", pad.testTag("padText"))
+    Button(onClick = {}, modifier = pad.testTag("padButton")) { TextBlock("Padded button") }
+    StackPanel(pad) { TextBlock("In a padded panel", Modifier.testTag("padPanelChild")) }
+    // A Canvas has no padding: the modifier has no effect and prints a warning once.
+    Canvas(pad.size(40.0, 8.0)) {}
 }

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import dotktx.compose.ui.winui.Icon
 import dotktx.compose.ui.winui.AutoSuggestBox
 import dotktx.compose.ui.winui.Border
 import dotktx.compose.ui.winui.Button
@@ -143,7 +144,7 @@ private fun Suggest() {
         onSuggestionChosen = { chosen = it; query = it },
         onQuerySubmitted = { typed, suggestion -> submitted = if (suggestion != null) "suggestion:$suggestion" else typed },
         placeholder = "Search fruit",
-        queryIcon = Symbol.Find,
+        queryIcon = Icon.Symbol(Symbol.Find),
     )
     Button({ query = "Cherry" }, Modifier.testTag("suggestFromApp")) { TextBlock("Set Cherry from the app") }
     TextBlock("query=$query chosen=$chosen submitted=$submitted", Modifier.testTag("suggestEcho"))

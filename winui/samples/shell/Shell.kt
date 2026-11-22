@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import dotktx.compose.ui.winui.Icon
 import dotktx.compose.ui.winui.Button
 import dotktx.compose.ui.winui.Expander
 import dotktx.compose.ui.winui.Grid
@@ -19,7 +20,6 @@ import dotktx.compose.ui.winui.TextBox
 import dotktx.compose.ui.winui.TitleBar
 import dotktx.compose.ui.winui.Window
 import dotktx.compose.ui.winui.application
-import dotktx.compose.ui.winui.gridCell
 import dotktx.compose.ui.winui.margin
 import dotktx.compose.ui.winui.rememberWindowState
 import dotktx.compose.ui.winui.testTag
@@ -27,9 +27,9 @@ import Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode
 import Microsoft.UI.Xaml.Controls.Symbol
 
 private val pages = listOf(
-    NavigationItem("home", "Home", Symbol.Home),
-    NavigationItem("documents", "Documents", Symbol.Document),
-    NavigationItem("about", "About", Symbol.Help),
+    NavigationItem("home", "Home", Icon.Symbol(Symbol.Home)),
+    NavigationItem("documents", "Documents", Icon.Symbol(Symbol.Document)),
+    NavigationItem("about", "About", Icon.Symbol(Symbol.Help)),
 )
 
 fun main() = application {
@@ -41,8 +41,9 @@ fun main() = application {
         Grid(rows = listOf(GridSize.Auto, GridSize.Star())) {
             TitleBar(
                 "Shell",
-                Modifier.gridCell(0, 0).testTag("titleBar"),
+                Modifier.cell(0, 0).testTag("titleBar"),
                 subtitle = "Compose on WinUI",
+                icon = Icon.Glyph("\uE80F"),
                 onBack = if (history.isEmpty()) null else ({ page = history.last(); history = history.dropLast(1) }),
                 onPaneToggle = { paneOpen = !paneOpen },
             )
@@ -50,7 +51,7 @@ fun main() = application {
                 pages,
                 selectedKey = page,
                 onSelect = { if (it != page) { history = history + page; page = it } },
-                modifier = Modifier.gridCell(1, 0).testTag("nav"),
+                modifier = Modifier.cell(1, 0).testTag("nav"),
                 paneDisplayMode = NavigationViewPaneDisplayMode.Left,
                 paneOpen = paneOpen,
                 onPaneOpenChange = { paneOpen = it },

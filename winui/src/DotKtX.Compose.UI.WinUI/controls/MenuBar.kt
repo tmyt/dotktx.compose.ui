@@ -17,7 +17,7 @@ data class MenuBarMenu(val title: String, val entries: List<MenuEntry>)
  *
  * ```
  * MenuBar(listOf(
- *     MenuBarMenu("File", listOf(MenuEntry.Item("Open", Symbol.OpenFile) { open() }, MenuEntry.Item("Exit") { exit() })),
+ *     MenuBarMenu("File", listOf(MenuEntry.Item("Open", Icon.Symbol(Symbol.OpenFile)) { open() }, MenuEntry.Item("Exit") { exit() })),
  *     MenuBarMenu("View", listOf(MenuEntry.Toggle("Status bar", checked = statusBar) { statusBar = it })),
  * ))
  * ```
