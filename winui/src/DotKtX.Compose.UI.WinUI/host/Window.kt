@@ -76,9 +76,15 @@ fun ApplicationScope.Window(
         window.Activate()
         onDispose {
             sync.stop()
-            composition.dispose()
             closing.close()
             closingFromComposition = true
+            // Hidden before anything is torn down, so that the system's hide animation plays on the
+            // intact window. Disposing the composition clears Window.Content and lets TitleBar restore
+            // the system title bar, and Window.Close() itself clears the XAML content before its
+            // animation; either would otherwise be visible while the window fades out. The composition
+            // is disposed before Close(), because a closed window rejects Content changes.
+            window.AppWindow.Hide()
+            composition.dispose()
             window.Close()
             host.windowClosed()
         }
