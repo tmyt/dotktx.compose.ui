@@ -19,7 +19,7 @@ fun main() = application {
 
 | Package | Kotlin package | State |
 |---|---|---|
-| `DotKtX.Compose.UI.WinUI` | `dotktx.compose.ui.winui` | experimental; DotKt SDK 0.9.31 |
+| `DotKtX.Compose.UI.WinUI` | `dotktx.compose.ui.winui` | experimental; DotKt SDK 0.9.33 |
 
 Design: [`docs/design-winui.md`](docs/design-winui.md).
 
@@ -99,7 +99,7 @@ A complete application project:
     <StartupObject>MainKt</StartupObject>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="DotKtX.Compose.UI.WinUI" Version="0.3.0" />
+    <PackageReference Include="DotKtX.Compose.UI.WinUI" Version="0.3.1" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
   </ItemGroup>
 </Project>
@@ -108,7 +108,7 @@ A complete application project:
 with `global.json` pinning the DotKt SDK the packages were built with:
 
 ```json
-{ "msbuild-sdks": { "DotKt.Sdk": "0.9.31" } }
+{ "msbuild-sdks": { "DotKt.Sdk": "0.9.33" } }
 ```
 
 The library is compiled against the Windows SDK projection that .NET SDK 10 selects

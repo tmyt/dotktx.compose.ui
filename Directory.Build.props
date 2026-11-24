@@ -18,7 +18,7 @@
          with either .NET SDK provide the WinRT.Runtime version it references or a newer one. -->
     <WindowsSdkPackageVersion>10.0.19041.57</WindowsSdkPackageVersion>
     <DotKtXWindowsAppSDKVersion>2.2.0</DotKtXWindowsAppSDKVersion>
-    <DotKtXComposeUIVersion>0.3.0</DotKtXComposeUIVersion>
+    <DotKtXComposeUIVersion>0.3.1</DotKtXComposeUIVersion>
     <DotKtXAtomicFUVersion>[0.9.13]</DotKtXAtomicFUVersion>
     <DotKtXCoroutinesVersion>[0.9.13]</DotKtXCoroutinesVersion>
   </PropertyGroup>
