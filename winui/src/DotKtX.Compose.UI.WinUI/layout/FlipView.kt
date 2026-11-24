@@ -46,8 +46,8 @@ fun <T> FlipView(
 /**
  * `FlipView` is not a `ListViewBase` and raises no `ContainerContentChanging`. Its containers use the
  * same empty-`Grid` item template as [ListView], and after every layout pass the containers its
- * panel shows are scanned: a host whose container now shows another item is bound again. Only the
- * selected item and its neighbours are realized, so the scan is short, and it binds nothing while
+ * panel shows are scanned: an item whose container is new gets its host placed there. Only the
+ * selected item and its neighbours are realized, so the scan is short, and it moves nothing while
  * the containers keep their items. Overriding `PrepareContainerForItemOverride` instead would need a
  * Kotlin subclass of `FlipView`, which XAML does not know and refuses the `FlipView` style for.
  */
@@ -70,6 +70,7 @@ internal class FlipViewNode<T>(private val view: XamlFlipView, private val conta
 
     private fun scan() {
         containers.scan(view.ItemsPanelRoot) { idOf(view.ItemFromContainer(it)) }
+        containers.sweep()
     }
 
     /** Changing the items can move WinUI's selection; that is not a user change, and sync restores it. */

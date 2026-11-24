@@ -8,7 +8,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import Microsoft.UI.Xaml.DataTemplate
 import Microsoft.UI.Xaml.DependencyObject
-import Microsoft.UI.Xaml.UIElement
 import Microsoft.UI.Xaml.Controls.ContainerContentChangingEventArgs
 import Microsoft.UI.Xaml.Controls.ContentControl
 import Microsoft.UI.Xaml.Controls.Grid
@@ -25,11 +24,10 @@ import Microsoft.UI.Xaml.Controls.ListView as XamlListView
  * selection). Selecting an item calls [onSelectedIndexChange].
  *
  * Only the items in view get elements. Each realized item is composed by [itemContent] in a
- * composition of its own. With [key], an item keeps its element, and the state remembered inside
- * [itemContent], while items are inserted and removed around it; keys must be unique. An item that
- * moves to another position gets a new element. Without [key], items are identified by position.
- * Elements scrolled out of view are recycled for other items, so lasting per-item state belongs in
- * the items or above the list. With [onItemClick], clicking an item also calls it with the item's
+ * composition of its own. With [key], an item keeps the state remembered inside [itemContent] while
+ * it stays in view, also when items are inserted and removed around it or the list is reordered;
+ * keys must be unique. Without [key], items are identified by position. An item scrolled out of view
+ * leaves composition, so lasting per-item state belongs in the items or above the list. With [onItemClick], clicking an item also calls it with the item's
  * index. Give the list a bounded height.
  *
  * ```
@@ -215,6 +213,7 @@ internal class ItemsListNode<T>(
         view.ItemTemplate = itemHostTemplate()
         view.ItemsSource = source
         onRelease(view.ContainerContentChanging.subscribe { _, e -> containers.containerChanged(e, idOf(e.Item)) })
+        onRelease(view.LayoutUpdated.subscribe { _, _ -> containers.sweep() })
         onRelease(view.SelectionChanged.subscribe { _, _ ->
             when (val s = selection) {
                 is ListSelection.Single -> single.userChanged(s.onChange)
@@ -284,64 +283,85 @@ internal class ItemsListNode<T>(
 
 /**
  * The item compositions of a list built on `ListViewBase`. The list's item template is an empty
- * `Grid` (see [itemHostTemplate]); each container's template root becomes an [ItemHost] the first
- * time the container is prepared, and stays with the container when WinUI recycles it.
+ * `Grid` (see [itemHostTemplate]); a container's template root is the place where the [ItemHost] of
+ * the item the container shows is put. When WinUI prepares another container for an item, the item's
+ * host moves there with its composition.
  *
  * `ContainerContentChanging` is the hook: `ListViewBase` raises it synchronously when it prepares a
- * container for an item and when it puts a container in its recycle queue, which matches binding and
- * unbinding a host. An `IElementFactory` is not available here, `ChoosingItemContainer` only picks
- * the container (its content is filled afterwards from the template), and a `DataTemplateSelector`
- * returns a template rather than the element it creates.
+ * container for an item and when it puts a container in its recycle queue. An `IElementFactory` is
+ * not available here, `ChoosingItemContainer` only picks the container (its content is filled
+ * afterwards from the template), and a `DataTemplateSelector` returns a template rather than the
+ * element it creates. The list calls [sweep] after each layout pass, when the containers of the items
+ * in view are prepared.
  */
-internal class ContainerItems<T>(private val parent: CompositionContext, owner: String) {
-    val compositions = ItemCompositions<T>(owner)
-    private val hosts = HashMap<UIElement, ItemHost>()
+internal class ContainerItems<T>(parent: CompositionContext, owner: String) {
+    val compositions = ItemCompositions<T>(owner, parent)
+    private val placed = HashMap<Grid, String>()
+    private val places = HashMap<String, Grid>()
 
     fun containerChanged(e: ContainerContentChangingEventArgs, id: String?) {
         val root = e.ItemContainer.ContentTemplateRoot as? Grid ?: return
-        if (e.InRecycleQueue || id == null) {
-            hosts[root]?.let { compositions.unbind(it) }
-        } else {
-            val host = hosts.getOrPut(root) { ItemHost(parent, root) }
-            compositions.bind(host, id)
-        }
+        if (e.InRecycleQueue || id == null) vacate(root) else place(root, id)
         e.Handled = true
     }
 
+    /** Puts the host of the item with [id] in [root], taking it out of the container it was in. */
+    private fun place(root: Grid, id: String) {
+        if (placed[root] == id) return
+        vacate(root)
+        val host = compositions.attach(id)
+        places.remove(id)?.let { previous ->
+            placed.remove(previous)
+            previous.Children.Clear()
+        }
+        root.Children.Add(host.element)
+        placed[root] = id
+        places[id] = root
+    }
+
+    /** Empties [root]; the item it showed is detached unless another container takes it first. */
+    private fun vacate(root: Grid) {
+        val id = placed.remove(root) ?: return
+        places.remove(id)
+        root.Children.Clear()
+        compositions.detach(id)
+    }
+
     /**
-     * Binds the containers that [panel] currently shows, for lists that raise no
-     * `ContainerContentChanging` for them: hosts whose container shows another item are bound again,
-     * and hosts whose container is gone or recycled are unbound. [itemId] gives the id of the item a
-     * container shows, or null for a recycled container.
+     * Places the items that the containers of [panel] currently show, for lists that raise no
+     * `ContainerContentChanging` for them, and vacates containers that are gone or recycled.
+     * [itemId] gives the id of the item a container shows, or null for a recycled container.
      */
     fun scan(panel: Panel?, itemId: (DependencyObject) -> String?) {
         if (panel == null) return
-        val seen = HashSet<ItemHost>()
+        val seen = HashSet<Grid>()
         val children = panel.Children
         for (i in 0 until children.Count) {
             val container = children[i] as? ContentControl ?: continue
             val root = container.ContentTemplateRoot as? Grid ?: continue
             val id = itemId(container) ?: continue
-            val host = hosts.getOrPut(root) { ItemHost(parent, root) }
-            seen.add(host)
-            if (compositions.boundId(host) != id) compositions.bind(host, id)
+            seen.add(root)
+            place(root, id)
         }
-        for (host in hosts.values) {
-            if (host !in seen && compositions.boundId(host) != null) compositions.unbind(host)
+        for (root in placed.keys.toList()) {
+            if (root !in seen) vacate(root)
         }
     }
 
+    fun sweep() {
+        compositions.sweep()
+    }
+
     fun dispose() {
-        for (host in hosts.values) host.composition.dispose()
-        hosts.clear()
-        compositions.clear()
+        compositions.dispose()
+        placed.clear()
+        places.clear()
     }
 }
 
 /**
- * An item template whose root is an empty `Grid`, the host of an item's composition. Templates can
- * only be created from markup; the template ignores the item (its id), which the host's composition
- * shows instead.
+ * An item template whose root is an empty `Grid`, the place of an item's host. Templates can only be
+ * created from markup; the template ignores the item (its id), whose host shows the item instead.
  */
 internal fun itemHostTemplate(): DataTemplate =
     XamlReader.Load("<DataTemplate xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\"><Grid/></DataTemplate>") as DataTemplate

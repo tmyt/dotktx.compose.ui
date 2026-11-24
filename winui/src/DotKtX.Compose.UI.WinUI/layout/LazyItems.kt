@@ -63,6 +63,7 @@ internal class LazyItemsNode<T>(private val viewer: XamlScrollViewer, factory: I
         repeater.ItemTemplate = factory
         repeater.ItemsSource = factory.source
         viewer.Content = repeater
+        onRelease(repeater.LayoutUpdated.subscribe { _, _ -> factory.sweep() })
     }
 
     fun setOrientation(orientation: Orientation) {
@@ -76,14 +77,14 @@ internal class LazyItemsNode<T>(private val viewer: XamlScrollViewer, factory: I
 }
 
 /**
- * Creates and recycles the elements of a [LazyItems] list for `ItemsRepeater`. Each element is a host
- * `Grid` whose child is composed from the item with the id it currently shows.
+ * Creates and recycles the elements of a [LazyItems] list for `ItemsRepeater`. An item's element is
+ * the element of its [ItemHost], so the repeater can recycle it and ask for the item again within a
+ * layout pass without the item losing its composition. The list calls [sweep] after each layout pass.
  */
-internal class ItemFactory<T>(private val parent: CompositionContext) : IElementFactory {
+internal class ItemFactory<T>(parent: CompositionContext) : IElementFactory {
     val source = KeyedSource()
-    private val compositions = ItemCompositions<T>("LazyItems")
-    private val hosts = HashMap<UIElement, ItemHost>()
-    private val pool = ArrayList<ItemHost>()
+    private val compositions = ItemCompositions<T>("LazyItems", parent)
+    private val shown = HashMap<UIElement, String>()
 
     /** Called on every recomposition of the list. */
     fun update(newItems: List<T>, key: ((T) -> Any)?, newContent: @Composable (T) -> Unit) {
@@ -93,21 +94,22 @@ internal class ItemFactory<T>(private val parent: CompositionContext) : IElement
 
     override fun GetElement(args: ElementFactoryGetArgs): UIElement {
         val id = args.Data as String
-        val host = if (pool.isEmpty()) ItemHost(parent).also { hosts[it.element] = it } else pool.removeAt(pool.size - 1)
-        compositions.bind(host, id)
+        val host = compositions.attach(id)
+        shown[host.element] = id
         return host.element
     }
 
     override fun RecycleElement(args: ElementFactoryRecycleArgs) {
-        val host = hosts[args.Element] ?: return
-        compositions.unbind(host)
-        pool.add(host)
+        val id = shown.remove(args.Element) ?: return
+        compositions.detach(id)
+    }
+
+    fun sweep() {
+        compositions.sweep()
     }
 
     fun dispose() {
-        for (host in hosts.values) host.composition.dispose()
-        hosts.clear()
-        compositions.clear()
-        pool.clear()
+        compositions.dispose()
+        shown.clear()
     }
 }

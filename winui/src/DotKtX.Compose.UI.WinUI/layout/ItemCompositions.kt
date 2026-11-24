@@ -125,13 +125,17 @@ private fun longestCommonOrder(kept: List<String>, ids: List<String>): Set<Strin
 }
 
 /**
- * The items of a list whose elements WinUI realizes, and the compositions of the realized elements.
+ * The items of a list whose elements WinUI realizes, and the compositions that show them.
  *
- * Each realized element is an [ItemHost] whose composition shows the item with the id the host is
- * bound to. The list gives the items on every recomposition ([update]) and binds and unbinds hosts as
- * WinUI realizes and recycles elements.
+ * A composition belongs to an item id, as a slot of a lazy list belongs to its key: the list
+ * [attach]es the id when WinUI realizes an element for the item, places the [ItemHost]'s element in
+ * that element, and [detach]es the id when WinUI recycles the element. The item keeps its composition,
+ * and the state remembered in it, while it moves from one element to another; WinUI's lists move an
+ * item to another element whenever it changes position, and sometimes when items are inserted around
+ * it. Ids that stay detached until the next [sweep] lose their composed content, as an item scrolled
+ * out of view does, and their hosts are reused for other items.
  */
-internal class ItemCompositions<T>(private val owner: String) {
+internal class ItemCompositions<T>(private val owner: String, private val parent: CompositionContext) {
     var ids: List<String> = emptyList()
         private set
     private var items: List<T> = emptyList()
@@ -139,7 +143,10 @@ internal class ItemCompositions<T>(private val owner: String) {
     private val idsByKey = HashMap<Any, String>()
     private var nextId = 0
     private var indexById = HashMap<String, Int>()
-    private val realized = HashMap<ItemHost, String>()
+    private val hosts = HashMap<String, ItemHost>()
+    private val detached = HashSet<String>()
+    private val pool = ArrayList<ItemHost>()
+    private val created = ArrayList<ItemHost>()
 
     /**
      * Takes the items of a recomposition of the list. Returns true when the ids changed; the list then
@@ -157,9 +164,9 @@ internal class ItemCompositions<T>(private val owner: String) {
         return true
     }
 
-    /** Elements that stay realized show their item's current data in place. */
+    /** Composed items show their item's current data in place. */
     fun refresh() {
-        for ((host, id) in realized) {
+        for ((id, host) in hosts) {
             val index = indexOf(id)
             if (index >= 0) show(host, id, index)
         }
@@ -180,47 +187,72 @@ internal class ItemCompositions<T>(private val owner: String) {
         return result
     }
 
-    /** [host] now shows the item with [id]. */
-    fun bind(host: ItemHost, id: String) {
-        realized[host] = id
+    /**
+     * The host of the item with [id], composing the item in a free host when it has none. The host's
+     * element may still be placed in the element the item was realized in before; the list moves it.
+     */
+    fun attach(id: String): ItemHost {
+        detached.remove(id)
+        hosts[id]?.let { return it }
+        val host = if (pool.isEmpty()) ItemHost(parent).also { created.add(it) } else pool.removeAt(pool.size - 1)
+        hosts[id] = host
         val index = indexOf(id)
         if (index >= 0) show(host, id, index)
+        return host
     }
 
-    /** The id [host] is bound to, or null while it is recycled. */
-    fun boundId(host: ItemHost): String? = realized[host]
+    /** The host of the item with [id], or null when the item is not composed. */
+    fun hostOf(id: String): ItemHost? = hosts[id]
 
-    /** [host] was recycled; it keeps its composition until it is bound again. */
-    fun unbind(host: ItemHost) {
-        realized.remove(host)
+    /** WinUI recycled the element the item with [id] was realized in; it keeps its composition until [sweep]. */
+    fun detach(id: String) {
+        if (id in hosts) detached.add(id)
+    }
+
+    /**
+     * Called once WinUI has realized the elements it needs: items detached since the last sweep and not
+     * attached again leave composition, and their hosts become free.
+     */
+    fun sweep() {
+        if (detached.isEmpty()) return
+        for (id in detached) {
+            val host = hosts.remove(id) ?: continue
+            host.composition.setContent {}
+            pool.add(host)
+        }
+        detached.clear()
     }
 
     /** The text shown by the composed content of the item with [id], or "" while it is not realized. */
     fun textOf(id: String): String {
-        for ((host, bound) in realized) if (bound == id) return plainText(host.element)
-        return ""
+        if (id in detached) return ""
+        return hosts[id]?.let { plainText(it.element) } ?: ""
     }
 
     private fun show(host: ItemHost, id: String, index: Int) {
         val item = items[index]
         val itemContent = content
-        // Keyed by id: a recycled host must not hand the state of its previous item to the next one.
+        // Keyed by id: content a free host held for another item never carries over.
         host.composition.setContent { key(id) { itemContent(item) } }
     }
 
-    fun clear() {
-        realized.clear()
+    fun dispose() {
+        for (host in created) host.composition.dispose()
+        created.clear()
+        hosts.clear()
+        detached.clear()
+        pool.clear()
     }
 }
 
 /**
- * The element of one realized item and the composition that fills it.
+ * The element of one composed item and the composition that fills it.
  *
- * The host is a `Grid` (several children allowed) rather than a single-child `Border`: when a
- * recycled host switches to another item, the new item's element is inserted before the old one is
- * removed.
+ * The host is a `Grid` (several children allowed) rather than a single-child `Border`, so that
+ * content changes can insert the new element before the old one is removed.
  */
-internal class ItemHost(parent: CompositionContext, val element: Grid = Grid()) {
+internal class ItemHost(parent: CompositionContext) {
+    val element = Grid()
     val composition = Composition(WinUIApplier(ItemRoot(element)), parent)
 }
 

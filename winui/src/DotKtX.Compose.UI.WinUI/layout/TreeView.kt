@@ -76,11 +76,13 @@ internal class TreeViewElementNode<T>(
     var onExpandedKeysChange: (Set<Any>) -> Unit = {}
     var expansionControlled = false
     private var nodes = HashMap<String, TreeViewNode>()
+    /** The automation name of a node's item: the text of its composed content. */
+    private val label: (String) -> String = { containers.compositions.textOf(it) }
     private var keys = HashMap<String, Any>()
     private val idsByKey = HashMap<Any, String>()
 
     val selection = ControlledValue<Any?>(
-        read = { (view.SelectedNode?.Content as? String)?.let { keys[it] } },
+        read = { idOf(view.SelectedNode?.Content)?.let { keys[it] } },
         write = { key -> view.SelectedNode = key?.let { idsByKey[it] }?.let { nodes[it] } },
     )
 
@@ -93,6 +95,7 @@ internal class TreeViewElementNode<T>(
         view.SelectionMode = TreeViewSelectionMode.Single
         view.ItemTemplate = itemHostTemplate()
         onRelease(view.Loaded.subscribe { _, _ -> attachList() })
+        onRelease(view.LayoutUpdated.subscribe { _, _ -> containers.sweep() })
         onRelease(view.SelectionChanged.subscribe { _, _ -> selection.userChanged(onSelectedKeyChange) })
         onRelease(view.Expanding.subscribe { _, _ -> if (expansionControlled) expansion.userChanged(onExpandedKeysChange) })
         onRelease(view.Collapsed.subscribe { _, _ -> if (expansionControlled) expansion.userChanged(onExpandedKeysChange) })
@@ -112,12 +115,12 @@ internal class TreeViewElementNode<T>(
         if (listAttached) return
         val list = findByName(view, "ListControl") as? ListViewBase ?: return
         listAttached = true
-        // The node's content is its id; the host's composition shows the item instead.
+        // The node's content is its id (an ItemKey); the host's composition shows the item instead.
         onRelease(list.ContainerContentChanging.subscribe { _, e -> containers.containerChanged(e, nodeId(e.Item)) })
         containers.scan(list.ItemsPanelRoot) { nodeId(list.ItemFromContainer(it)) }
     }
 
-    private fun nodeId(item: Any?): String? = (item as? TreeViewNode)?.Content as? String
+    private fun nodeId(item: Any?): String? = idOf((item as? TreeViewNode)?.Content)
 
     private fun expandedKeys(): Set<Any> {
         val result = HashSet<Any>()
@@ -160,7 +163,7 @@ internal class TreeViewElementNode<T>(
             val k = key(values[i])
             newKeys[id] = k
             idsByKey[k] = id
-            val node = nodes[id] ?: TreeViewNode().also { it.Content = id }
+            val node = nodes[id] ?: TreeViewNode().also { it.Content = ItemKey(id, label) }
             newNodes.add(node)
             byId[id] = node
         }

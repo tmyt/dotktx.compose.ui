@@ -51,7 +51,7 @@ if (-not $win) { "FAIL no Collections window"; exit 1 }
 $processId = $win.Current.ProcessId
 
 # ListView: items are realized with their composed content, selection flows both ways, and keyed
-# rows keep their remembered state when a row is inserted above them.
+# rows keep their remembered state when a row is inserted above them and when the list is reordered.
 Check 'ListView item content realized' 'Banana' { Text $win 'fruit2' }
 Check 'ListView item is a list item' 'ListItem' { (Item-Of $win 'fruit2').Current.ControlType.ProgrammaticName -replace 'ControlType.','' }
 Act { Select-Item $win 'fruit3' }
@@ -75,6 +75,8 @@ Check 'ListView keyed reorder on screen' '4,3,2,1,5' {
   @($texts | Where-Object { $_.Current.AutomationId -like 'fruit*' } | Sort-Object { $_.Current.BoundingRectangle.Y } | ForEach-Object { $_.Current.AutomationId -replace 'fruit','' }) -join ','
 }
 Check 'ListView echo after reorder' 'fruit=Damson index=0 order=4,3,2,1,5 clicks=0' { Text $win 'fruitEcho' }
+Check 'ListView row state kept after reorder' 'On' { [string](Pattern (Find-Id $win 'ripe2') $Toggle).Current.ToggleState }
+Check 'ListView neighbour state after reorder' 'Off' { [string](Pattern (Find-Id $win 'ripe1') $Toggle).Current.ToggleState }
 Check 'ListView item named by its content' 'Apple' { (Item-Of $win 'fruit1').Current.Name }
 Act { (Pattern (Item-Of $win 'fruit3') $Invoke).Invoke() }
 Check 'ListView item click' 'clicks=1' { (Text $win 'fruitEcho') -replace '.* (clicks=\d+)$', '$1' }
