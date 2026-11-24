@@ -23,7 +23,7 @@ fun main() = application {
 
 Design: [`docs/design-winui.md`](docs/design-winui.md).
 
-## Status (2026-11-24, DotKt SDK 0.9.32)
+## Status (2026-11-24, DotKt SDK 0.9.33)
 
 `DotKtX.Compose.UI.WinUI` is its own assembly over the separately built Compose runtime DLL. All
 eight samples (counter, gallery, shell, interop, inputs, pickers, collections, commands) run on

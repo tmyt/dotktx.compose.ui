@@ -4,6 +4,6 @@
     "rollForward": "latestFeature"
   },
   "msbuild-sdks": {
-    "DotKt.Sdk": "0.9.32"
+    "DotKt.Sdk": "0.9.33"
   }
 }
