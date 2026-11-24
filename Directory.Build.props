@@ -19,7 +19,7 @@
     <WindowsSdkPackageVersion>10.0.19041.57</WindowsSdkPackageVersion>
     <DotKtXWindowsAppSDKVersion>2.2.0</DotKtXWindowsAppSDKVersion>
     <DotKtXComposeUIVersion>0.3.0</DotKtXComposeUIVersion>
-    <DotKtXAtomicFUVersion>[0.9.11]</DotKtXAtomicFUVersion>
-    <DotKtXCoroutinesVersion>[0.9.11]</DotKtXCoroutinesVersion>
+    <DotKtXAtomicFUVersion>[0.9.12]</DotKtXAtomicFUVersion>
+    <DotKtXCoroutinesVersion>[0.9.12]</DotKtXCoroutinesVersion>
   </PropertyGroup>
 </Project>
