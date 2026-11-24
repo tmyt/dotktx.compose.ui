@@ -393,9 +393,8 @@ The scopes carry `@LayoutScopeMarker`, a `@DslMarker` like Compose's. Inside ano
 layout's content the outer scope is not an implicit receiver, so a child of a `Canvas` inside a
 `Grid` cannot take `cell`, which neither panel would use. Content lambdas without a receiver
 (`StackPanel`, `Border`, a `Button`'s content) do not hide the outer scope, the same as a plain
-`@Composable () -> Unit` lambda inside a Compose `Row`. DotKt does not yet enforce the marker across
-assemblies (tmyt/dotkt#1821), so in applications only the scope itself is checked: `cell` outside
-any `Grid` content does not compile.
+`@Composable () -> Unit` lambda inside a Compose `Row`. `cell` outside any `Grid` content does not
+compile at all.
 
 Children of a `RelativePanel` are placed against each other, the way Compose's `ConstraintLayout`
 does it. References come from `createRefs()` in the panel's scope, and `Modifier.relative(ref) { … }`
