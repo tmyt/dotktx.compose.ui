@@ -18,7 +18,16 @@ function Find-Window($title, $seconds = 30) {
   return $null
 }
 
-function Find-Id($root, $id) { $root.FindFirst($Scope::Descendants, (Cond $A::AutomationIdProperty $id)) }
+# An element can appear a layout pass after the action that realizes it (for example a list row after
+# ScrollIntoView), so lookups retry briefly.
+function Find-Id($root, $id) {
+  for ($t = 0; $t -lt 10; $t++) {
+    $e = $root.FindFirst($Scope::Descendants, (Cond $A::AutomationIdProperty $id))
+    if ($e) { return $e }
+    Start-Sleep -Milliseconds 150
+  }
+  return $null
+}
 
 # Waits until $probe returns $expected (UI updates land after a frame), then records the result.
 function Check($label, $expected, [scriptblock]$probe) {
