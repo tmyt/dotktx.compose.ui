@@ -25,6 +25,7 @@ import dotktx.compose.ui.winui.rememberWindowState
 import dotktx.compose.ui.winui.testTag
 import Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode
 import Microsoft.UI.Xaml.Controls.Symbol
+import System.STAThreadAttribute
 
 private val pages = listOf(
     NavigationItem("home", "Home", Icon.Symbol(Symbol.Home)),
@@ -32,6 +33,7 @@ private val pages = listOf(
     NavigationItem("about", "About", Icon.Symbol(Symbol.Help)),
 )
 
+@STAThreadAttribute
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "Shell", state = rememberWindowState(width = 960.0, height = 640.0)) {
         var page by remember { mutableStateOf("home") }

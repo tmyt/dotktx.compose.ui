@@ -34,6 +34,7 @@ import Microsoft.UI.Xaml.Controls.SplitViewDisplayMode
 import Microsoft.UI.Xaml.Controls.Symbol
 import System.DateTimeOffset
 import System.TimeSpan
+import System.STAThreadAttribute
 
 // Noon UTC falls on the same calendar day in every time zone from UTC-11 to UTC+11, so the pickers,
 // which show local dates, show the day the echo text names.
@@ -44,6 +45,7 @@ private fun formatDate(date: DateTimeOffset?): String = if (date == null) "none"
 private fun formatTime(time: TimeSpan?): String =
     if (time == null) "none" else "${time.Hours.toString().padStart(2, '0')}:${time.Minutes.toString().padStart(2, '0')}"
 
+@STAThreadAttribute
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "Pickers", state = rememberWindowState(width = 1100.0, height = 900.0)) {
         Grid(Modifier.margin(16.0), columns = listOf(GridSize.Star(), GridSize.Star()), columnSpacing = 24.0) {

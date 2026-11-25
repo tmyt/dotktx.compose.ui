@@ -7,6 +7,7 @@ It is built directly on the Compose runtime (`DotKtX.AndroidX.Compose.Runtime`, 
 `dotktx.compose`), not on `androidx.compose.ui`.
 
 ```kotlin
+@STAThreadAttribute // WinUI runs on an STA thread; without it, application { } starts one of its own.
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "Counter") {
         var count by remember { mutableIntStateOf(0) }

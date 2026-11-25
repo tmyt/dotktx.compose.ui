@@ -29,7 +29,9 @@ Other libraries also run the Compose runtime over a foreign native tree: JetBrai
 ```kotlin
 import androidx.compose.runtime.*
 import dotktx.compose.ui.winui.*
+import System.STAThreadAttribute
 
+@STAThreadAttribute
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "Counter") {
         var count by remember { mutableIntStateOf(0) }
@@ -98,9 +100,10 @@ interface ApplicationScope {
 }
 ```
 
-1. `application` starts a dedicated thread with `ApartmentState.STA` and joins it. WinUI requires
-   STA, and DotKt cannot mark `main` with `[STAThread]`.
-2. On that thread it calls `bootstrapWindowsAppSDK()`, then
+1. WinUI requires an STA thread. When `main` is marked with `@STAThreadAttribute` (recommended), the
+   calling thread already is one and `application` runs there. Otherwise it starts a dedicated thread
+   with `ApartmentState.STA` and joins it, so an unmarked `main` still works.
+2. On the STA thread it calls `bootstrapWindowsAppSDK()`, then
    `Application.Start { ComposeApplication(content) }`, then `shutdownWindowsAppSDK()`.
    - `bootstrapWindowsAppSDK()` reads the version that §2 wrote to runtimeconfig.json
      (`AppContext.GetData`).

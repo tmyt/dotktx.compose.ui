@@ -35,7 +35,9 @@ import Microsoft.UI.Xaml.Controls.Orientation
 import Microsoft.UI.Xaml.Controls.FontIconSource
 import Microsoft.UI.Xaml.Controls.Symbol
 import Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode
+import System.STAThreadAttribute
 
+@STAThreadAttribute
 fun main() {
     // WebView2 keeps its browser profile next to the executable by default. The sample can run from a
     // network path (\\wsl.localhost\… when started from WSL), so the profile goes to a local folder.

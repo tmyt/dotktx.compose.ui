@@ -22,9 +22,7 @@ import Microsoft.UI.Xaml.Markup.IXamlMetadataProvider
 import Microsoft.UI.Xaml.Markup.IXamlType
 import Microsoft.UI.Xaml.Markup.XmlnsDefinition
 import Microsoft.UI.Xaml.XamlTypeInfo.XamlControlsXamlMetaDataProvider
-import System.Threading.ApartmentState
-import System.Threading.Thread
-import System.Threading.ThreadStart
+import System.STAThreadAttribute
 import System.Type
 import Microsoft.UI.Xaml.Controls.Button as XamlButton
 import Microsoft.UI.Xaml.Controls.StackPanel as XamlStackPanel
@@ -36,15 +34,11 @@ import Microsoft.UI.Xaml.Window as XamlWindow
 /** Snapshot state written by plain WinUI event handlers and read by the Compose content. */
 private val nativeClicks = mutableIntStateOf(0)
 
+@STAThreadAttribute
 fun main() {
-    val ui = Thread(ThreadStart {
-        bootstrapWindowsAppSDK()
-        Application.Start { _ -> InteropApp() }
-        shutdownWindowsAppSDK()
-    })
-    ui.SetApartmentState(ApartmentState.STA)
-    ui.Start()
-    ui.Join()
+    bootstrapWindowsAppSDK()
+    Application.Start { _ -> InteropApp() }
+    shutdownWindowsAppSDK()
 }
 
 private class InteropApp : Application(), IXamlMetadataProvider {

@@ -10,6 +10,8 @@ import dotktx.compose.ui.winui.Window
 import dotktx.compose.ui.winui.align
 import dotktx.compose.ui.winui.application
 
+// Left without @STAThreadAttribute on purpose: the counter (also the package smoke test) covers the
+// path where application { } starts its own STA thread.
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "Counter") {
         var count by remember { mutableIntStateOf(0) }

@@ -30,23 +30,32 @@ interface ApplicationScope {
  * Runs a WinUI application whose windows are declared by [content]. Returns when the application
  * exits: after [ApplicationScope.exitApplication], or when [content] no longer contains a window.
  *
+ * WinUI runs on an STA thread. Mark `main` with `@STAThreadAttribute` so the application runs on the
+ * main thread. Without it, the application runs on a dedicated STA thread and this call waits for it.
+ *
  * ```
+ * @STAThreadAttribute
  * fun main() = application {
  *     Window(onCloseRequest = ::exitApplication, title = "Hello") { TextBlock("Hello") }
  * }
  * ```
  */
 fun application(content: @Composable ApplicationScope.() -> Unit) {
-    // WinUI needs an STA thread, and DotKt cannot mark `main` with [STAThread].
-    val ui = Thread(ThreadStart {
-        // Unpackaged apps load the Windows App SDK runtime before the first WinUI call.
-        bootstrapWindowsAppSDK()
-        Application.Start { _ -> ComposeApplication(content) }
-        shutdownWindowsAppSDK()
-    })
+    if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA) {
+        runApplication(content)
+        return
+    }
+    val ui = Thread(ThreadStart { runApplication(content) })
     ui.SetApartmentState(ApartmentState.STA)
     ui.Start()
     ui.Join()
+}
+
+private fun runApplication(content: @Composable ApplicationScope.() -> Unit) {
+    // Unpackaged apps load the Windows App SDK runtime before the first WinUI call.
+    bootstrapWindowsAppSDK()
+    Application.Start { _ -> ComposeApplication(content) }
+    shutdownWindowsAppSDK()
 }
 
 /**

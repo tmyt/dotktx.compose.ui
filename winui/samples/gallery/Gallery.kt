@@ -56,7 +56,9 @@ import Microsoft.UI.Colors
 import Microsoft.UI.Xaml.Controls.Orientation
 import Microsoft.UI.Xaml.Controls.Symbol
 import Microsoft.UI.Xaml.Media.SolidColorBrush
+import System.STAThreadAttribute
 
+@STAThreadAttribute
 fun main() = application {
     var showSettings by remember { mutableStateOf(false) }
     val mainWindow = rememberWindowState(width = 720.0, height = 640.0, position = WindowPosition.Center)

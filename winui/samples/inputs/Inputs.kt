@@ -34,7 +34,9 @@ import Microsoft.UI.Xaml.Controls.Orientation
 import Microsoft.UI.Xaml.Controls.Symbol
 import Microsoft.UI.Xaml.Media.SolidColorBrush
 import Windows.UI.Color
+import System.STAThreadAttribute
 
+@STAThreadAttribute
 fun main() = application {
     Window(onCloseRequest = ::exitApplication, title = "Inputs", state = rememberWindowState(width = 760.0, height = 900.0)) {
         ScrollViewer {

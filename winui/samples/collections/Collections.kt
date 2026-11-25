@@ -31,7 +31,9 @@ import dotktx.compose.ui.winui.size
 import dotktx.compose.ui.winui.testTag
 import Microsoft.UI.Xaml.Controls.Orientation
 import Microsoft.UI.Xaml.Controls.Symbol
+import System.STAThreadAttribute
 
+@STAThreadAttribute
 fun main() = application {
     val state = rememberWindowState(width = 1100.0, height = 900.0, position = WindowPosition.Center)
     Window(onCloseRequest = ::exitApplication, title = "Collections", state = state) {
