@@ -1,0 +1,21 @@
+<Project>
+  <!-- Registers the analyzers shipped in this package with kotc (and, through
+       DotKtX.Experimental.LspSupport, with the Kotlin LSP). Set DotKtXComposeUIAnalyzersEnabled to
+       false to build without them. -->
+  <PropertyGroup>
+    <_DotKtXComposeUIAnalyzersTools>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../tools/'))</_DotKtXComposeUIAnalyzersTools>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(DotKtXComposeUIAnalyzersEnabled)' != 'false'">
+    <DotKtCompilerPlugin Include="$(_DotKtXComposeUIAnalyzersTools)DotKtX.Compose.UI.Analyzers.jar" />
+  </ItemGroup>
+
+  <!-- A compiler plugin works only with the Kotlin compiler version it was built for. -->
+  <Target Name="DotKtXCheckComposeUIAnalyzersVersion" BeforeTargets="DotKtComputeCompileOptions"
+          Condition="'$(DotKtXComposeUIAnalyzersEnabled)' != 'false'">
+    <PropertyGroup>
+      <_DotKtXComposeUIAnalyzersKotlinVersion>$([System.IO.File]::ReadAllText('$(_DotKtXComposeUIAnalyzersTools)kotlin-version.txt').Trim())</_DotKtXComposeUIAnalyzersKotlinVersion>
+    </PropertyGroup>
+    <Error Condition="'$(DotKtKotlinVersion)' != '' and '$(_DotKtXComposeUIAnalyzersKotlinVersion)' != '$(DotKtKotlinVersion)'"
+           Text="DotKtX.Compose.UI.Analyzers was built for Kotlin $(_DotKtXComposeUIAnalyzersKotlinVersion), but this DotKt SDK embeds Kotlin $(DotKtKotlinVersion). Use the DotKtX.Compose.UI packages built for this SDK, or set DotKtXComposeUIAnalyzersEnabled to false." />
+  </Target>
+</Project>

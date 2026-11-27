@@ -13,6 +13,7 @@
     <StartupObject>ShellKt</StartupObject>
   </PropertyGroup>
   <Import Project="$(DotKtXComposeRepo)eng/ComposeCompilerPlugin.targets" />
+  <Import Project="../../../eng/Analyzers.targets" />
   <!-- The package applies this through buildTransitive; a ProjectReference has to import it. -->
   <Import Project="../../src/DotKtX.Compose.UI.WinUI/buildTransitive/DotKtX.Compose.UI.WinUI.targets" />
   <ItemGroup>

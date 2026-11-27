@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.Build.NoTargets">
+  <!-- Packs the analyzers (a Kotlin compiler plugin JAR that kotc and the Kotlin LSP run) with targets
+       that register it for every project that references a Compose UI backend. The package has no assembly. -->
+  <Import Project="../eng/Analyzers.targets" />
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <PackageId>DotKtX.Compose.UI.Analyzers</PackageId>
+    <IsPackable>true</IsPackable>
+    <Version>$(DotKtXComposeUIVersion)</Version>
+    <Authors>yutaka</Authors>
+    <Description>Build-time and editor diagnostics for Compose UI on DotKt, driven by the annotations in DotKtX.Compose.UI.Annotations. A Kotlin compiler plugin registered for kotc through buildTransitive.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="$(DotKtXComposeUIAnalyzersJar)" Pack="true" PackagePath="tools/" Visible="false" />
+    <None Include="$(DotKtXComposeUIAnalyzersDir)kotlin-version.txt" Pack="true" PackagePath="tools/" Visible="false" />
+    <None Include="buildTransitive/DotKtX.Compose.UI.Analyzers.targets" Pack="true" PackagePath="buildTransitive/" />
+  </ItemGroup>
+</Project>

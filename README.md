@@ -80,8 +80,10 @@ and runs its UI Automation test (`winui/tests/uia/`).
 
 An application references `DotKtX.Compose.UI.WinUI` and `Microsoft.WindowsAppSDK`. The package
 brings the Compose runtime and, through it, the Compose compiler plugin
-(`DotKtX.AndroidX.Compose.Compiler`), so `@Composable` code compiles without further setup. The
-packages depend on the exact DotKt SDK they were built with.
+(`DotKtX.AndroidX.Compose.Compiler`), so `@Composable` code compiles without further setup. It also
+brings `DotKtX.Compose.UI.Analyzers`, a compiler plugin that reports mistakes at build time and in the
+editor, such as a `main` without `@STAThreadAttribute`; set `DotKtXComposeUIAnalyzersEnabled` to
+`false` to build without it. The packages depend on the exact DotKt SDK they were built with.
 
 A complete application project:
 
@@ -119,7 +121,7 @@ one.
 
 ```bash
 bash ../dotktx.compose/scripts/pack.sh   # Compose runtime and compiler plugin packages
-bash scripts/pack.sh                     # DotKtX.Compose.UI.Annotations and .WinUI into artifacts/packages
+bash scripts/pack.sh                     # DotKtX.Compose.UI.Annotations, .Analyzers and .WinUI into artifacts/packages
 bash scripts/verify-packages.sh          # counter built from the packages, run with its UI Automation test
 ```
 

@@ -679,7 +679,9 @@ dotktx.compose.ui/
   annotations/src/DotKtX.Compose.UI.Annotations/
                        requirements that backends declare on their API, such as @RequiresSTAThread
   analyzers/           K2 compiler plugin (FIR checkers) that reads those annotations, for kotc and the
-                       Kotlin LSP; built by scripts/build-analyzers.sh
+                       Kotlin LSP; built by scripts/build-analyzers.sh and packed as
+                       DotKtX.Compose.UI.Analyzers, whose buildTransitive targets register it
+  eng/                 Analyzers.targets: registers the analyzers built from source for this repository
   winui/src/DotKtX.Compose.UI.WinUI/
     buildTransitive/   application manifest and Windows App SDK version targets
     host/              application, Window, WindowState, ContentDialog, ComposeHost, UIRuntime,

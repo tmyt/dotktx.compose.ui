@@ -1,0 +1,18 @@
+<Project>
+  <!-- Projects of this repository use the analyzers built from source; applications get the same
+       registration from the DotKtX.Compose.UI.Analyzers package (analyzers/buildTransitive). -->
+  <PropertyGroup>
+    <DotKtXComposeUIAnalyzersDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../artifacts/analyzers/'))</DotKtXComposeUIAnalyzersDir>
+    <DotKtXComposeUIAnalyzersJar>$(DotKtXComposeUIAnalyzersDir)DotKtX.Compose.UI.Analyzers.jar</DotKtXComposeUIAnalyzersJar>
+  </PropertyGroup>
+  <ItemGroup>
+    <DotKtCompilerPlugin Include="$(DotKtXComposeUIAnalyzersJar)" />
+    <_DotKtXComposeUIAnalyzersSource Include="$(MSBuildThisFileDirectory)../analyzers/src/**/*" />
+    <_DotKtXComposeUIAnalyzersSource Include="$(MSBuildThisFileDirectory)../scripts/build-analyzers.sh;$(MSBuildThisFileDirectory)../global.json" />
+  </ItemGroup>
+  <!-- Build before kotc arguments are written (they hash the JAR). -->
+  <Target Name="BuildDotKtXComposeUIAnalyzers" BeforeTargets="DotKtComputeCompileOptions;_GetPackageFiles"
+          Inputs="@(_DotKtXComposeUIAnalyzersSource)" Outputs="$(DotKtXComposeUIAnalyzersJar)">
+    <Exec Command="bash &quot;$(MSBuildThisFileDirectory)../scripts/build-analyzers.sh&quot;" />
+  </Target>
+</Project>
