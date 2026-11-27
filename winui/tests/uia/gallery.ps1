@@ -210,6 +210,13 @@ Check 'list remove first' 'done2,done1' $order
 Check 'item 2 still checked after remove' 'On' { [string](Pattern (Find-Id $win 'done2') ([System.Windows.Automation.TogglePattern])).Current.ToggleState }
 Check 'item 1 unchecked' 'Off' { [string](Pattern (Find-Id $win 'done1') ([System.Windows.Automation.TogglePattern])).Current.ToggleState }
 
+# Single-child slot: content switching between two separate ifs, in both directions.
+$switch = Pattern (Find-Id $win 'slotSwitch') ([System.Windows.Automation.InvokePattern])
+foreach ($expected in 'On', 'Off', 'On', 'Off') {
+  $switch.Invoke()
+  Check "slot switch to $expected" $expected { Text $win 'slotSwitch' }
+}
+
 # LazyItems: only visible rows are realized; scrolling, data changes and count changes.
 function Realized() {
   $texts = $win.FindAll($Scope::Descendants, (Cond $A::ControlTypeProperty ([System.Windows.Automation.ControlType]::Text)))

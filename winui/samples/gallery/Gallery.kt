@@ -73,6 +73,7 @@ fun main() = application {
                 MoreControls()
                 TextBlock("Keyed list", fontSize = 20.0)
                 KeyedList()
+                SlotSwitch()
                 TextBlock("Lazy list", fontSize = 20.0)
                 LazyList()
                 KeyedLazyList()
@@ -244,6 +245,19 @@ private fun KeyedList() {
         }
     }
     TextBlock("count=${items.size}", Modifier.testTag("count"))
+}
+
+/**
+ * Button content that switches between two separate `if`s. Within one apply the new element can be
+ * inserted before the old one is removed, so the single-child slot briefly holds both.
+ */
+@Composable
+private fun SlotSwitch() {
+    var on by remember { mutableStateOf(false) }
+    Button({ on = !on }, Modifier.testTag("slotSwitch")) {
+        if (on) TextBlock("On")
+        if (!on) TextBlock("Off")
+    }
 }
 
 @Composable

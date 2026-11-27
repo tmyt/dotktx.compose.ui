@@ -10,12 +10,24 @@ import androidx.compose.runtime.AbstractApplier
  * parent's layout for every descendant.
  */
 internal class WinUIApplier(root: Node) : AbstractApplier<Node>(root) {
+    /** Single-child slots that held more than one child at some point of the current apply. */
+    private val overfull = ArrayList<ChildSlot.Single>()
+
     override fun insertTopDown(index: Int, instance: Node) {}
 
     override fun insertBottomUp(index: Int, instance: Node) {
         val element = instance as? ElementNode<*>
             ?: throw IllegalStateException("Only element nodes can be children")
-        current.children.insert(index, element)
+        val slot = current.children
+        slot.insert(index, element)
+        if (slot is ChildSlot.Single && slot.overfull) overfull.add(slot)
+    }
+
+    override fun onEndChanges() {
+        if (overfull.isEmpty()) return
+        val failed = overfull.firstOrNull { it.overfull }
+        overfull.clear()
+        if (failed != null) throw failed.overfullError()
     }
 
     override fun remove(index: Int, count: Int) {

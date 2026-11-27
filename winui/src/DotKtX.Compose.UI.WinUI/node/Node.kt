@@ -54,30 +54,58 @@ internal sealed interface ChildSlot {
         override fun clear() {}
     }
 
-    /** Exactly one child: `ContentControl.Content`, `Border.Child`, `Window.Content`, … */
+    /**
+     * At most one child: `ContentControl.Content`, `Border.Child`, `Window.Content`, …
+     *
+     * Within one apply the slot can briefly hold two children: when content switches between
+     * two separate `if`s, the insert of the new element can come before the remove of the old
+     * one. The element is handed over whenever one child is left, and [WinUIApplier] reports a
+     * slot that still holds more than one once the changes are applied.
+     */
     class Single(private val owner: String, private val set: (UIElement?) -> Unit) : ChildSlot {
-        private var occupied = false
+        private val nodes = ArrayList<ElementNode<*>>(1)
+        private var shown: UIElement? = null
+
+        val overfull: Boolean get() = nodes.size > 1
 
         override fun insert(index: Int, child: ElementNode<*>) {
-            check(!occupied) { "$owner content must emit one element; wrap several in a StackPanel or Grid" }
-            occupied = true
-            set(child.element)
+            nodes.add(index, child)
+            show()
         }
 
         override fun remove(index: Int, count: Int) {
-            if (count > 0) {
-                occupied = false
-                set(null)
-            }
+            for (i in 0 until count) nodes.removeAt(index)
+            show()
         }
 
+        /** Same contract as `AbstractApplier.move`: [to] is the destination index before the items are removed. */
         override fun move(from: Int, to: Int, count: Int) {
-            throw IllegalStateException("$owner holds a single element; nothing can be moved")
+            val dest = if (from > to) to else to - count
+            val moved = ArrayList<ElementNode<*>>(count)
+            for (i in 0 until count) moved.add(nodes.removeAt(from))
+            nodes.addAll(dest, moved)
         }
 
         override fun clear() {
-            occupied = false
-            set(null)
+            nodes.clear()
+            show()
+        }
+
+        /** Thrown by [WinUIApplier] when the applied changes leave more than one child. */
+        fun overfullError(): IllegalStateException {
+            val types = nodes.joinToString { it.element::class.simpleName ?: "?" }
+            return IllegalStateException(
+                "$owner content emitted ${nodes.size} elements ($types) but holds one; wrap them in a StackPanel or Grid",
+            )
+        }
+
+        private fun show() {
+            if (nodes.size > 1) return
+            val element = nodes.firstOrNull()?.element
+            if (element !== shown) {
+                shown = element
+                set(element)
+            }
         }
     }
 

@@ -259,11 +259,15 @@ The applier sees only `Node.children`. The root of a window, dialog or host comp
 `ElementNode`.
 
 - **`None`** rejects children with an error that names the owner.
-- **`Single`** rejects a second child with an error that names the owner ("`Button` content must
-  emit one element; wrap several in a StackPanel or Grid"). See §10, decision 2.
-- **`Many.move`** follows the contract of `AbstractApplier.move`, where `to` is the destination index
-  before the items are removed. It is implemented with `UIElementCollection.Move` for a single item,
-  and with remove and insert for several.
+- **`Single`** holds at most one child once the changes are applied. Within one apply it can briefly
+  hold two: when content switches between two separate `if`s, the insert of the new element can come
+  before the remove of the old one. The element is handed to the owner whenever one child is left,
+  and `WinUIApplier.onEndChanges` rejects a slot that still holds more than one, with an error that
+  names the owner and the children ("`Button` content emitted 2 elements (TextBlock, TextBlock) but
+  holds one; wrap them in a StackPanel or Grid"). See §10, decision 2.
+- **`Single.move`** and **`Many.move`** follow the contract of `AbstractApplier.move`, where `to` is
+  the destination index before the items are removed. `Many` uses `UIElementCollection.Move` for a
+  single item, and remove and insert for several.
 
 ### 4.2 `WinUIApplier`
 
@@ -641,7 +645,7 @@ when the target lives in another composition, such as a `LazyItems` row.
    the classes, and `WinUIElement` factories can use fully qualified names.
 2. **Several children in a single-child slot are an error.** An implicit `StackPanel` would hide a
    layout decision and add an element the application did not ask for. The error names the owner
-   and suggests `StackPanel` or `Grid`.
+   and the children and suggests `StackPanel` or `Grid`.
 3. **Sizes are `Double` effective pixels.** Effective pixels are WinUI's unit and correspond to `dp`.
    A `Dp` value class (`8.dp`) would change every size parameter, so it waits until value classes are
    established on DotKt.
@@ -695,7 +699,7 @@ dotktx.compose.ui/
 | Sample | Covers |
 |---|---|
 | `counter` | The example in §1, closing through `onCloseRequest` |
-| `gallery` | Controls and layouts; controlled inputs, including accepted and rejected edits; keyed list moves with remembered per-item state; modifiers; menus; `LazyItems`, with and without keys; `WindowState`; `ContentDialog`; a second window |
+| `gallery` | Controls and layouts; controlled inputs, including accepted and rejected edits; keyed list moves with remembered per-item state; content switching between separate `if`s in a single-child slot; modifiers; menus; `LazyItems`, with and without keys; `WindowState`; `ContentDialog`; a second window |
 | `shell` | `TitleBar`, `NavigationView` (controlled selection and pane), `TabView` (selection, close, add), `Expander` |
 | `interop` | A plain WinUI application that hosts Compose through `ComposeHost` and shares state with WinUI code |
 | `inputs` | Toggle, repeat and split buttons, `RatingControl`, `ColorPicker`, `AutoSuggestBox` (typing, rejected edits, suggestions, query), `RichEditBox` |
