@@ -1,6 +1,7 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Recomposer
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -8,6 +9,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.setMain
 import Microsoft.UI.Dispatching.DispatcherQueue
+import System.Environment
 import System.Threading.Thread
 
 /**
@@ -30,7 +32,25 @@ internal class UIRuntime private constructor(val queue: DispatcherQueue) {
         // The first UI thread becomes Dispatchers.Main, so LaunchedEffect and plain Main code land on it.
         if (runtimes.isEmpty()) Dispatchers.setMain(dispatcher)
         snapshots.start()
-        scope.launch(start = CoroutineStart.UNDISPATCHED) { recomposer.runRecomposeAndApplyChanges() }
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            try {
+                recomposer.runRecomposeAndApplyChanges()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                compositionFailed(e)
+            }
+        }
+    }
+
+    /**
+     * An exception from recomposition or from applying changes ends the recomposer, so no window of
+     * this thread would update again. The process ends like one with an unhandled exception: the
+     * message and stack trace go to the error output and the Windows event log.
+     */
+    private fun compositionFailed(e: Throwable): Nothing {
+        Environment.FailFast("Compose for WinUI: the composition failed.\n" + e.stackTraceToString())
+        throw e
     }
 
     fun shutdown() {

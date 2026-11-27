@@ -178,6 +178,11 @@ by managed thread ID) and lives until it is shut down. The application compositi
 `ComposeHost` (§8) on a thread share it. As a result, state written anywhere on that thread
 recomposes all of them. Using the runtime from a thread without a `DispatcherQueue` is an error.
 
+An exception thrown during recomposition or while changes are applied (for example a second element
+in a single-child slot, §4.1) ends the recomposer, after which no window of the thread would update
+again. The runtime therefore ends the process with `Environment.FailFast`, as an unhandled exception
+does: the message and the stack trace go to the error output and to the Windows event log.
+
 ### 3.6 `Window`
 
 ```kotlin
