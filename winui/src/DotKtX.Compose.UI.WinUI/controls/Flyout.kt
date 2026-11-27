@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
+import dotktx.compose.ui.annotations.AtMostOneElementContent
 import Microsoft.UI.Xaml.Controls.Primitives.FlyoutPlacementMode
 import Microsoft.UI.Xaml.Controls.Flyout as XamlFlyout
 
@@ -35,7 +36,7 @@ fun Flyout(
     anchor: PopupAnchor,
     onDismissRequest: () -> Unit,
     placement: FlyoutPlacementMode = FlyoutPlacementMode.Top,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     val parent = rememberCompositionContext()
     val currentContent by rememberUpdatedState(content)

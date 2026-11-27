@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.ComboBox as XamlComboBox
 
 /**
@@ -11,6 +12,7 @@ import Microsoft.UI.Xaml.Controls.ComboBox as XamlComboBox
  * ComboBox(items = sizes, selectedIndex = size, onSelectedIndexChange = { size = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun ComboBox(
     items: List<String>,

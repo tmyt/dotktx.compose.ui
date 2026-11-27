@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.RatingControl as XamlRatingControl
 
 /**
@@ -14,6 +15,7 @@ import Microsoft.UI.Xaml.Controls.RatingControl as XamlRatingControl
  * RatingControl(value = stars, onValueChange = { stars = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun RatingControl(
     value: Double,

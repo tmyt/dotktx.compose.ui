@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
+import dotktx.compose.ui.annotations.AtMostOneElementContent
 import Microsoft.UI.Xaml.FrameworkElement
 import Microsoft.UI.Xaml.Controls.ContentDialogButton
 import Microsoft.UI.Xaml.Controls.ContentDialogResult
@@ -45,7 +46,7 @@ fun ContentDialog(
     onSecondaryClick: () -> Unit = {},
     closeButtonText: String = "",
     defaultButton: DialogButton = DialogButton.None,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     val xamlRootSource = LocalXamlRootSource.current
     val parent = rememberCompositionContext()

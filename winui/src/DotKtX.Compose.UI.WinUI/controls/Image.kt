@@ -1,6 +1,7 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Media.Stretch
 import Microsoft.UI.Xaml.Media.Imaging.BitmapImage
 import System.Uri
@@ -11,6 +12,7 @@ import Microsoft.UI.Xaml.Controls.Image as XamlImage
  * `C:\\images\\logo.png`). [stretch] decides how it fills the element's size. Set
  * [Modifier.semantics] to describe the image for screen readers.
  */
+@EmitsOneElement
 @Composable
 fun Image(
     source: String,

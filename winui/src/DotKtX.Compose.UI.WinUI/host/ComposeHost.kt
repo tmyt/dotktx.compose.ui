@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import dotktx.compose.ui.annotations.AtMostOneElementContent
 import Microsoft.UI.Xaml.FrameworkElement
 import Microsoft.UI.Xaml.Controls.ContentControl
 
@@ -41,7 +42,7 @@ open class ComposeHost : ContentControl() {
     }
 
     /** Sets the content, replacing the previous one. It is composed now if the host is loaded. */
-    fun setContent(content: @Composable () -> Unit) {
+    fun setContent(@AtMostOneElementContent content: @Composable () -> Unit) {
         this.content = content
         if (IsLoaded) compose()
     }

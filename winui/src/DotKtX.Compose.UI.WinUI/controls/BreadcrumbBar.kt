@@ -1,6 +1,7 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import System.Collections.ObjectModel.ObservableCollection
 import Microsoft.UI.Xaml.Controls.BreadcrumbBar as XamlBreadcrumbBar
 
@@ -13,6 +14,7 @@ import Microsoft.UI.Xaml.Controls.BreadcrumbBar as XamlBreadcrumbBar
  * BreadcrumbBar(path, onItemClick = { path = path.take(it + 1) })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun BreadcrumbBar(
     items: List<String>,

@@ -1,6 +1,7 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.TextWrapping
 import Microsoft.UI.Xaml.Controls.TextBlock as XamlTextBlock
 
@@ -8,6 +9,7 @@ import Microsoft.UI.Xaml.Controls.TextBlock as XamlTextBlock
  * Read-only text (`TextBlock`). [fontSize] is in effective pixels; `NaN` keeps the size from the
  * theme. [wrap] breaks lines at the available width instead of clipping.
  */
+@EmitsOneElement
 @Composable
 fun TextBlock(
     text: String,

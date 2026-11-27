@@ -1,6 +1,7 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.FrameworkElement
 import Microsoft.UI.Xaml.GridLength
 import Microsoft.UI.Xaml.GridUnitType
@@ -38,6 +39,7 @@ private fun GridSize.toGridLength(): GridLength = when (this) {
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun Grid(
     modifier: Modifier = Modifier,

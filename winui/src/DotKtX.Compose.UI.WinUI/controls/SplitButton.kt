@@ -2,6 +2,8 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.SplitButton as XamlSplitButton
 import Microsoft.UI.Xaml.Controls.ToggleSplitButton as XamlToggleSplitButton
 
@@ -17,13 +19,14 @@ import Microsoft.UI.Xaml.Controls.ToggleSplitButton as XamlToggleSplitButton
  * ) { TextBlock("Paste") }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun SplitButton(
     onClick: () -> Unit,
     menu: List<MenuEntry>,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     Container({ SplitButtonNode(XamlSplitButton()) }, modifier, {
         set(onClick) { this.onClick = it }
@@ -55,6 +58,7 @@ internal class SplitButtonNode(button: XamlSplitButton) :
  * ) { TextBlock("List") }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun ToggleSplitButton(
     checked: Boolean,
@@ -62,7 +66,7 @@ fun ToggleSplitButton(
     menu: List<MenuEntry>,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     val scope = currentRecomposeScope
     Container({ ToggleSplitButtonNode(XamlToggleSplitButton()) }, modifier, {

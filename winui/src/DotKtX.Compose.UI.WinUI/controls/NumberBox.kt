@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.NumberBoxSpinButtonPlacementMode
 import Microsoft.UI.Xaml.Controls.NumberBox as XamlNumberBox
 
@@ -14,6 +15,7 @@ import Microsoft.UI.Xaml.Controls.NumberBox as XamlNumberBox
  * NumberBox(value = quantity, onValueChange = { quantity = it }, minimum = 1.0, maximum = 99.0)
  * ```
  */
+@EmitsOneElement
 @Composable
 fun NumberBox(
     value: Double,

@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.PasswordBox as XamlPasswordBox
 
 /**
@@ -11,6 +12,7 @@ import Microsoft.UI.Xaml.Controls.PasswordBox as XamlPasswordBox
  * PasswordBox(password = secret, onPasswordChange = { secret = it }, placeholder = "Password")
  * ```
  */
+@EmitsOneElement
 @Composable
 fun PasswordBox(
     password: String,

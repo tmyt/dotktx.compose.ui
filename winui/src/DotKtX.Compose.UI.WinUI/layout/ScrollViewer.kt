@@ -1,6 +1,8 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.ScrollBarVisibility
 import Microsoft.UI.Xaml.Controls.ScrollMode
 import Microsoft.UI.Xaml.Controls.ScrollViewer as XamlScrollViewer
@@ -12,11 +14,12 @@ enum class ScrollDirection { Vertical, Horizontal, Both }
  * Scrolls one child that is larger than the viewport (`ScrollViewer`). [content] must emit at most one
  * element; in a scrolling direction it is measured with unlimited space.
  */
+@EmitsOneElement
 @Composable
 fun ScrollViewer(
     modifier: Modifier = Modifier,
     direction: ScrollDirection = ScrollDirection.Vertical,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     Container({ scrollNode(XamlScrollViewer()) }, modifier, {
         set(direction) {

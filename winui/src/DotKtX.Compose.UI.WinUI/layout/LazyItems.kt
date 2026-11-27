@@ -5,6 +5,7 @@ import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.ElementFactoryGetArgs
 import Microsoft.UI.Xaml.ElementFactoryRecycleArgs
 import Microsoft.UI.Xaml.IElementFactory
@@ -32,6 +33,7 @@ import Microsoft.UI.Xaml.Controls.ScrollViewer as XamlScrollViewer
  * LazyItems(messages, Modifier.height(400.0), key = { it.id }, spacing = 4.0) { message -> MessageRow(message) }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun <T> LazyItems(
     items: List<T>,

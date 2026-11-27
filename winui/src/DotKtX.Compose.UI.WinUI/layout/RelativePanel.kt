@@ -3,6 +3,7 @@ package dotktx.compose.ui.winui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.DependencyProperty
 import Microsoft.UI.Xaml.FrameworkElement
 import Microsoft.UI.Xaml.Controls.RelativePanel as XamlRelativePanel
@@ -27,6 +28,7 @@ import Microsoft.UI.Xaml.Controls.RelativePanel as XamlRelativePanel
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun RelativePanel(
     modifier: Modifier = Modifier,

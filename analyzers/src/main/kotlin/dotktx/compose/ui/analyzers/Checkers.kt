@@ -23,11 +23,11 @@ import org.jetbrains.kotlin.name.Name
  */
 internal class Checkers(session: FirSession) : FirAdditionalCheckersExtension(session) {
     override val expressionCheckers: ExpressionCheckers = object : ExpressionCheckers() {
-        override val functionCallCheckers: Set<FirExpressionChecker<FirFunctionCall>> = setOf(RequiresSTAThreadCallChecker)
+        override val functionCallCheckers: Set<FirExpressionChecker<FirFunctionCall>> = setOf(RequiresSTAThreadCallChecker, SingleElementContentChecker)
     }
 }
 
-private val ANNOTATIONS = FqName("dotktx.compose.ui.annotations")
+internal val ANNOTATIONS = FqName("dotktx.compose.ui.annotations")
 private val REQUIRES_STA_THREAD = ClassId(ANNOTATIONS, Name.identifier("RequiresSTAThread"))
 private val STA_THREAD = ClassId(FqName("System"), Name.identifier("STAThreadAttribute"))
 private val MAIN = Name.identifier("main")

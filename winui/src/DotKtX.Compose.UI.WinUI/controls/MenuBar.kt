@@ -1,6 +1,7 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.MenuBarItem
 import Microsoft.UI.Xaml.Controls.MenuBar as XamlMenuBar
 
@@ -22,6 +23,7 @@ data class MenuBarMenu(val title: String, val entries: List<MenuEntry>)
  * ))
  * ```
  */
+@EmitsOneElement
 @Composable
 fun MenuBar(menus: List<MenuBarMenu>, modifier: Modifier = Modifier) {
     Leaf({ MenuBarNode(XamlMenuBar()) }, modifier) {

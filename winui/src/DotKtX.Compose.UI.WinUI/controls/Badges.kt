@@ -1,6 +1,7 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.InfoBadge as XamlInfoBadge
 import Microsoft.UI.Xaml.Controls.PersonPicture as XamlPersonPicture
 
@@ -14,6 +15,7 @@ import Microsoft.UI.Xaml.Controls.PersonPicture as XamlPersonPicture
  * InfoBadge(icon = Icon.Symbol(Symbol.Important))
  * ```
  */
+@EmitsOneElement
 @Composable
 fun InfoBadge(
     modifier: Modifier = Modifier,
@@ -34,6 +36,7 @@ fun InfoBadge(
  * PersonPicture(displayName = "Ann Lee", badgeNumber = missedCalls)
  * ```
  */
+@EmitsOneElement
 @Composable
 fun PersonPicture(
     displayName: String,

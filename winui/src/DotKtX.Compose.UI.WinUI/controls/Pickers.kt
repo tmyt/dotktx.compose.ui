@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.CalendarViewSelectionMode
 import System.DateTimeOffset
 import System.TimeSpan
@@ -22,6 +23,7 @@ import Microsoft.UI.Xaml.Controls.TimePicker as XamlTimePicker
  * DatePicker(selectedDate = due, onSelectedDateChange = { due = it }, header = "Due date")
  * ```
  */
+@EmitsOneElement
 @Composable
 fun DatePicker(
     selectedDate: DateTimeOffset?,
@@ -72,6 +74,7 @@ internal class DatePickerNode(picker: XamlDatePicker) : ElementNode<XamlDatePick
  * TimePicker(selectedTime = alarm, onSelectedTimeChange = { alarm = it }, minuteIncrement = 5)
  * ```
  */
+@EmitsOneElement
 @Composable
 fun TimePicker(
     selectedTime: TimeSpan?,
@@ -116,6 +119,7 @@ internal class TimePickerNode(picker: XamlTimePicker) : ElementNode<XamlTimePick
  * CalendarDatePicker(date = start, onDateChange = { start = it }, placeholder = "Pick a date")
  * ```
  */
+@EmitsOneElement
 @Composable
 fun CalendarDatePicker(
     date: DateTimeOffset?,
@@ -168,6 +172,7 @@ internal class CalendarDatePickerNode(picker: XamlCalendarDatePicker) :
  * CalendarView(selectedDate = day, onSelectedDateChange = { day = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun CalendarView(
     selectedDate: DateTimeOffset?,

@@ -3,6 +3,8 @@ package dotktx.compose.ui.winui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.AppBarButton
 import Microsoft.UI.Xaml.Controls.AppBarSeparator
 import Microsoft.UI.Xaml.Controls.AppBarToggleButton
@@ -58,6 +60,7 @@ sealed class CommandBarEntry {
  * ) { TextBlock(fileName) }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun CommandBar(
     primaryCommands: List<CommandBarEntry>,
@@ -66,7 +69,7 @@ fun CommandBar(
     isOpen: Boolean? = null,
     onOpenChange: (Boolean) -> Unit = {},
     defaultLabelPosition: CommandBarDefaultLabelPosition = CommandBarDefaultLabelPosition.Bottom,
-    content: @Composable () -> Unit = {},
+    @AtMostOneElementContent content: @Composable () -> Unit = {},
 ) {
     val scope = currentRecomposeScope
     Container({ CommandBarNode(XamlCommandBar()) }, modifier, {

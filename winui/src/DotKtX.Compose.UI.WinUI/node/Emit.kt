@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.Updater
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.FrameworkElement
 
 /**
@@ -17,6 +18,7 @@ import Microsoft.UI.Xaml.FrameworkElement
  * WinUIElement(factory = { RatingControl() }, modifier = Modifier.margin(8.0)) { it.Value = rating }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun <E : FrameworkElement> WinUIElement(
     factory: () -> E,

@@ -2,6 +2,8 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.Primitives.RepeatButton as XamlRepeatButton
 import Microsoft.UI.Xaml.Controls.Primitives.ToggleButton as XamlToggleButton
 
@@ -13,13 +15,14 @@ import Microsoft.UI.Xaml.Controls.Primitives.ToggleButton as XamlToggleButton
  * ToggleButton(checked = bold, onCheckedChange = { bold = it }) { TextBlock("Bold") }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun ToggleButton(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     val scope = currentRecomposeScope
     Container({ ToggleButtonNode(XamlToggleButton()) }, modifier, {
@@ -51,6 +54,7 @@ internal class ToggleButtonNode(button: XamlToggleButton) :
  * RepeatButton(onClick = { zoom++ }) { TextBlock("+") }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun RepeatButton(
     onClick: () -> Unit,
@@ -58,7 +62,7 @@ fun RepeatButton(
     enabled: Boolean = true,
     delayMillis: Int? = null,
     intervalMillis: Int? = null,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     Container({ ButtonNode(XamlRepeatButton(), "RepeatButton") }, modifier, {
         set(onClick) { this.onClick = it }

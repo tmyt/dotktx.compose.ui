@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.TextBox as XamlTextBox
 
 /**
@@ -15,6 +16,7 @@ import Microsoft.UI.Xaml.Controls.TextBox as XamlTextBox
  * TextBox(text = name, onTextChange = { name = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun TextBox(
     text: String,

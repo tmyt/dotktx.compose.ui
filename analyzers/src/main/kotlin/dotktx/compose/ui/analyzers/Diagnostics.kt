@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.diagnostics.KtDiagnosticFactoryToRendererMap
 import org.jetbrains.kotlin.diagnostics.KtDiagnosticsContainer
 import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
 import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
+import org.jetbrains.kotlin.diagnostics.error1
 import org.jetbrains.kotlin.diagnostics.rendering.CommonRenderers
 import org.jetbrains.kotlin.diagnostics.warning1
 import org.jetbrains.kotlin.psi.KtElement
@@ -19,6 +20,9 @@ object AnalyzerDiagnostics : KtDiagnosticsContainer() {
     /** A function marked `@RequiresSTAThread` called from a top-level `main` without `@STAThreadAttribute`. */
     val MAIN_WITHOUT_STA_THREAD by warning1<KtElement, String>(SourceElementPositioningStrategies.REFERENCED_NAME_BY_QUALIFIED)
 
+    /** Content for a parameter marked `@AtMostOneElementContent` that is certain to emit a second element. */
+    val SEVERAL_ELEMENTS_IN_SINGLE_ELEMENT_CONTENT by error1<KtElement, String>(SourceElementPositioningStrategies.REFERENCED_NAME_BY_QUALIFIED)
+
     override fun getRendererFactory(): BaseDiagnosticRendererFactory = AnalyzerDiagnosticMessages
 }
 
@@ -27,6 +31,11 @@ internal object AnalyzerDiagnosticMessages : BaseDiagnosticRendererFactory() {
         map.put(
             AnalyzerDiagnostics.MAIN_WITHOUT_STA_THREAD,
             "{0} needs an STA main thread; mark main with @STAThreadAttribute (import System.STAThreadAttribute).",
+            CommonRenderers.STRING,
+        )
+        map.put(
+            AnalyzerDiagnostics.SEVERAL_ELEMENTS_IN_SINGLE_ELEMENT_CONTENT,
+            "this is the second element in {0}, which holds at most one; wrap the elements in a layout container.",
             CommonRenderers.STRING,
         )
     }

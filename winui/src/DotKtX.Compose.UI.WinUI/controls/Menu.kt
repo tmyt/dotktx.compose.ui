@@ -1,6 +1,8 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.FrameworkElement
 import Microsoft.UI.Xaml.UIElement
 import Microsoft.UI.Xaml.Controls.MenuFlyout
@@ -72,12 +74,13 @@ private data class ContextMenuModifier(val entries: List<MenuEntry>) : ElementMo
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun DropDownButton(
     menu: List<MenuEntry>,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     Container({ dropDownNode(XamlDropDownButton()) }, modifier, {
         set(menu) { element.Flyout = menuFlyout(it) }

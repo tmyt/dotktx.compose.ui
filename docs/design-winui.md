@@ -645,7 +645,11 @@ when the target lives in another composition, such as a `LazyItems` row.
    the classes, and `WinUIElement` factories can use fully qualified names.
 2. **Several children in a single-child slot are an error.** An implicit `StackPanel` would hide a
    layout decision and add an element the application did not ask for. The error names the owner
-   and the children and suggests `StackPanel` or `Grid`.
+   and the children and suggests `StackPanel` or `Grid`. Content parameters of these slots are marked
+   `@AtMostOneElementContent` and element composables `@EmitsOneElement`, so the analyzers report
+   content that is certain to emit a second element (`SEVERAL_ELEMENTS_IN_SINGLE_ELEMENT_CONTENT`)
+   at build time. They count only marked calls at the top level of the content lambda; conditions,
+   loops and unmarked composables count as zero, and those cases are left to the run-time check.
 3. **Sizes are `Double` effective pixels.** Effective pixels are WinUI's unit and correspond to `dp`.
    A `Dp` value class (`8.dp`) would change every size parameter, so it waits until value classes are
    established on DotKt.
@@ -681,6 +685,7 @@ dotktx.compose.ui/
   analyzers/           K2 compiler plugin (FIR checkers) that reads those annotations, for kotc and the
                        Kotlin LSP; built by scripts/build-analyzers.sh and packed as
                        DotKtX.Compose.UI.Analyzers, whose buildTransitive targets register it
+  analyzers/tests/     sources with expected diagnostics, checked by scripts/test-analyzers.sh
   eng/                 Analyzers.targets: registers the analyzers built from source for this repository
   winui/src/DotKtX.Compose.UI.WinUI/
     buildTransitive/   application manifest and Windows App SDK version targets

@@ -2,6 +2,8 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.RadioButton as XamlRadioButton
 
 /**
@@ -15,13 +17,14 @@ import Microsoft.UI.Xaml.Controls.RadioButton as XamlRadioButton
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun RadioButton(
     selected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable () -> Unit = {},
+    @AtMostOneElementContent content: @Composable () -> Unit = {},
 ) {
     val scope = currentRecomposeScope
     Container({ RadioButtonNode(XamlRadioButton()) }, modifier, {

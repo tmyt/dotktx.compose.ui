@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Windows.UI.Color
 import Microsoft.UI.Xaml.Controls.ColorPicker as XamlColorPicker
 
@@ -19,6 +20,7 @@ import Microsoft.UI.Xaml.Controls.ColorPicker as XamlColorPicker
  * ColorPicker(color = accent, onColorChange = { accent = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun ColorPicker(
     color: Color,

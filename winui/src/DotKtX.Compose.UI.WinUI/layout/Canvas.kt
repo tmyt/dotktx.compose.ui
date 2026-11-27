@@ -1,6 +1,7 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.FrameworkElement
 import Microsoft.UI.Xaml.Controls.Canvas as XamlCanvas
 
@@ -15,6 +16,7 @@ import Microsoft.UI.Xaml.Controls.Canvas as XamlCanvas
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun Canvas(
     modifier: Modifier = Modifier,

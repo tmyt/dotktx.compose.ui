@@ -5,6 +5,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.FlipView as XamlFlipView
 
 /**
@@ -21,6 +22,7 @@ import Microsoft.UI.Xaml.Controls.FlipView as XamlFlipView
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun <T> FlipView(
     items: List<T>,

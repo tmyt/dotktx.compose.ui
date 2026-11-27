@@ -2,6 +2,8 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.CheckBox as XamlCheckBox
 import Microsoft.UI.Xaml.Controls.ToggleSwitch as XamlToggleSwitch
 
@@ -13,13 +15,14 @@ import Microsoft.UI.Xaml.Controls.ToggleSwitch as XamlToggleSwitch
  * CheckBox(checked = agreed, onCheckedChange = { agreed = it }) { TextBlock("I agree") }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun CheckBox(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable () -> Unit = {},
+    @AtMostOneElementContent content: @Composable () -> Unit = {},
 ) {
     val scope = currentRecomposeScope
     Container({ CheckBoxNode(XamlCheckBox()) }, modifier, {
@@ -49,6 +52,7 @@ internal class CheckBoxNode(box: XamlCheckBox) :
  * ToggleSwitch(isOn = wifi, onToggle = { wifi = it }, header = "Wi-Fi")
  * ```
  */
+@EmitsOneElement
 @Composable
 fun ToggleSwitch(
     isOn: Boolean,

@@ -1,6 +1,8 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.Primitives.ButtonBase
 import Microsoft.UI.Xaml.Controls.Button as XamlButton
 import Microsoft.UI.Xaml.Controls.HyperlinkButton as XamlHyperlinkButton
@@ -12,12 +14,13 @@ import Microsoft.UI.Xaml.Controls.HyperlinkButton as XamlHyperlinkButton
  * Button(onClick = { count++ }) { TextBlock("$count") }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun Button(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     Container({ ButtonNode(XamlButton(), "Button") }, modifier, {
         set(onClick) { this.onClick = it }
@@ -32,12 +35,13 @@ fun Button(
  * HyperlinkButton(onClick = { showHelp = true }) { TextBlock("Help") }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun HyperlinkButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     Container({ ButtonNode(XamlHyperlinkButton(), "HyperlinkButton") }, modifier, {
         set(onClick) { this.onClick = it }

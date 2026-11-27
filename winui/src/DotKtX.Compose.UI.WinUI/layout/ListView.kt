@@ -6,6 +6,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.DataTemplate
 import Microsoft.UI.Xaml.DependencyObject
 import Microsoft.UI.Xaml.Controls.ContainerContentChangingEventArgs
@@ -36,6 +37,7 @@ import Microsoft.UI.Xaml.Controls.ListView as XamlListView
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun <T> ListView(
     items: List<T>,
@@ -58,6 +60,7 @@ fun <T> ListView(
  * ListView(files, selectedIndices = checked, onSelectedIndicesChange = { checked = it }) { file -> TextBlock(file.name) }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun <T> ListView(
     items: List<T>,
@@ -79,6 +82,7 @@ fun <T> ListView(
  * ListView(commands, onItemClick = { commands[it].run() }) { command -> TextBlock(command.title) }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun <T> ListView(
     items: List<T>,
@@ -100,6 +104,7 @@ fun <T> ListView(
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun <T> GridView(
     items: List<T>,
@@ -121,6 +126,7 @@ fun <T> GridView(
  * GridView(photos, selectedIndices = picked, onSelectedIndicesChange = { picked = it }) { photo -> PhotoTile(photo) }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun <T> GridView(
     items: List<T>,
@@ -142,6 +148,7 @@ fun <T> GridView(
  * GridView(apps, onItemClick = { launch(apps[it]) }) { app -> AppTile(app) }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun <T> GridView(
     items: List<T>,

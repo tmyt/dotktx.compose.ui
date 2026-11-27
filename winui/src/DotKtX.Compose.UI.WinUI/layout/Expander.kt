@@ -2,6 +2,8 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.Expander as XamlExpander
 
 /**
@@ -12,13 +14,14 @@ import Microsoft.UI.Xaml.Controls.Expander as XamlExpander
  * Expander("Advanced", expanded = advanced, onExpandedChange = { advanced = it }) { AdvancedSettings() }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun Expander(
     header: String,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     val scope = currentRecomposeScope
     Container({ ExpanderNode(XamlExpander()) }, modifier, {

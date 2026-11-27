@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.AutoSuggestionBoxTextChangeReason
 import System.Collections.Generic.List as ClrList
 import Microsoft.UI.Xaml.Controls.AutoSuggestBox as XamlAutoSuggestBox
@@ -33,6 +34,7 @@ import Microsoft.UI.Xaml.Controls.AutoSuggestBox as XamlAutoSuggestBox
  * )
  * ```
  */
+@EmitsOneElement
 @Composable
 fun AutoSuggestBox(
     text: String,

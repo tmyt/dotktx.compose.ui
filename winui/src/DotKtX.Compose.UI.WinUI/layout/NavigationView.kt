@@ -2,6 +2,8 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.NavigationViewBackButtonVisible
 import Microsoft.UI.Xaml.Controls.NavigationViewItem
 import Microsoft.UI.Xaml.Controls.NavigationViewPaneDisplayMode
@@ -27,6 +29,7 @@ data class NavigationItem(val key: String, val label: String, val icon: Icon? = 
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun NavigationView(
     items: List<NavigationItem>,
@@ -39,7 +42,7 @@ fun NavigationView(
     paneOpen: Boolean? = null,
     onPaneOpenChange: (Boolean) -> Unit = {},
     paneToggleButton: Boolean = true,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     val scope = currentRecomposeScope
     Container({ NavigationViewNode(XamlNavigationView()) }, modifier, {

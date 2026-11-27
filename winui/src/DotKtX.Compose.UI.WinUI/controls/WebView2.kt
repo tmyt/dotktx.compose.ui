@@ -3,6 +3,7 @@ package dotktx.compose.ui.winui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.Web.WebView2.Core.CoreWebView2
 import Microsoft.UI.Xaml.Controls.WebView2 as XamlWebView2
 
@@ -27,6 +28,7 @@ data class WebNavigation(val source: String, val title: String, val success: Boo
  * WebView2(url, onSourceChange = { url = it }, Modifier.height(400.0))
  * ```
  */
+@EmitsOneElement
 @Composable
 fun WebView2(
     source: String,

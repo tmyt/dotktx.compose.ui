@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.ProgressBar as XamlProgressBar
 import Microsoft.UI.Xaml.Controls.Slider as XamlSlider
 
@@ -12,6 +13,7 @@ import Microsoft.UI.Xaml.Controls.Slider as XamlSlider
  * Slider(value = volume, onValueChange = { volume = it }, maximum = 10.0)
  * ```
  */
+@EmitsOneElement
 @Composable
 fun Slider(
     value: Double,
@@ -49,6 +51,7 @@ internal class SliderNode(slider: XamlSlider) : ElementNode<XamlSlider>(slider, 
  * A progress bar (`ProgressBar`) showing [value] out of [maximum], or an animation when
  * [indeterminate] is true.
  */
+@EmitsOneElement
 @Composable
 fun ProgressBar(
     value: Double,

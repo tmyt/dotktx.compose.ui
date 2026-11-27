@@ -5,6 +5,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.DependencyObject
 import Microsoft.UI.Xaml.FrameworkElement
 import Microsoft.UI.Xaml.Controls.ListViewBase
@@ -38,6 +39,7 @@ data class TreeItem<out T>(val value: T, val children: List<TreeItem<T>> = empty
  * ) { folder -> TextBlock(folder.name) }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun <T> TreeView(
     items: List<TreeItem<T>>,

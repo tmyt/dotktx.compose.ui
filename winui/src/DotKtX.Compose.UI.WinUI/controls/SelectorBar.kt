@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.SelectorBar as XamlSelectorBar
 import Microsoft.UI.Xaml.Controls.SelectorBarItem as XamlSelectorBarItem
 
@@ -17,6 +18,7 @@ data class SelectorBarEntry(val text: String, val icon: Icon? = null)
  * SelectorBar(listOf(SelectorBarEntry("Recent", Icon.Symbol(Symbol.Clock)), SelectorBarEntry("Shared")), selectedIndex = view, onSelectedIndexChange = { view = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun SelectorBar(
     items: List<SelectorBarEntry>,

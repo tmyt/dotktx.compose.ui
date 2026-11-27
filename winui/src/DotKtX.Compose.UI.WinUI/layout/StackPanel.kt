@@ -1,10 +1,12 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.Orientation
 import Microsoft.UI.Xaml.Controls.StackPanel as XamlStackPanel
 
 /** Arranges its children in one line (`StackPanel`). [spacing] is the gap between children, in effective pixels. */
+@EmitsOneElement
 @Composable
 fun StackPanel(
     modifier: Modifier = Modifier,

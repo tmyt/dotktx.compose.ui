@@ -1,6 +1,7 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import kotlin.clr.byref
 import Microsoft.UI.Text.TextGetOptions
 import Microsoft.UI.Text.TextSetOptions
@@ -26,6 +27,7 @@ import Microsoft.UI.Xaml.Controls.RichEditBox as XamlRichEditBox
  * RichEditBox(initialText = loadedNotes, onTextChange = { notes = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun RichEditBox(
     modifier: Modifier = Modifier,

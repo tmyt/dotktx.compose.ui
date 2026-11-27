@@ -3,6 +3,8 @@ package dotktx.compose.ui.winui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.TitleBar as XamlTitleBar
 
 /**
@@ -21,6 +23,7 @@ import Microsoft.UI.Xaml.Controls.TitleBar as XamlTitleBar
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun TitleBar(
     title: String,
@@ -29,7 +32,7 @@ fun TitleBar(
     icon: Icon? = null,
     onBack: (() -> Unit)? = null,
     onPaneToggle: (() -> Unit)? = null,
-    content: @Composable () -> Unit = {},
+    @AtMostOneElementContent content: @Composable () -> Unit = {},
 ) {
     val window = LocalWindow.current
     // Created here rather than in the node factory, because the window needs the element itself.

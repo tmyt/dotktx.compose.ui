@@ -2,6 +2,8 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.UIElement
 import Microsoft.UI.Xaml.Controls.Border
 import Microsoft.UI.Xaml.Controls.TabViewItem
@@ -23,6 +25,7 @@ data class TabItem(val header: String, val closable: Boolean = true)
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun TabView(
     tabs: List<TabItem>,
@@ -31,7 +34,7 @@ fun TabView(
     modifier: Modifier = Modifier,
     onClose: ((Int) -> Unit)? = null,
     onAdd: (() -> Unit)? = null,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     val scope = currentRecomposeScope
     Container({ tabViewNode(XamlTabView()) }, modifier, {

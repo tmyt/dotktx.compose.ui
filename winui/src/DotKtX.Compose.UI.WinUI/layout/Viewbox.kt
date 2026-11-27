@@ -1,6 +1,8 @@
 package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.StretchDirection
 import Microsoft.UI.Xaml.Media.Stretch
 import Microsoft.UI.Xaml.Controls.Viewbox as XamlViewbox
@@ -14,12 +16,13 @@ import Microsoft.UI.Xaml.Controls.Viewbox as XamlViewbox
  * Viewbox(Modifier.size(200.0, 100.0)) { TextBlock("Big") }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun Viewbox(
     modifier: Modifier = Modifier,
     stretch: Stretch = Stretch.Uniform,
     stretchDirection: StretchDirection = StretchDirection.Both,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     Container({ viewboxNode(XamlViewbox()) }, modifier, {
         set(stretch) { element.Stretch = it }

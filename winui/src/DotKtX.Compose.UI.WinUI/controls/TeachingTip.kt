@@ -2,6 +2,8 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.TeachingTipPlacementMode
 import Microsoft.UI.Xaml.Controls.TeachingTip as XamlTeachingTip
 
@@ -30,6 +32,7 @@ import Microsoft.UI.Xaml.Controls.TeachingTip as XamlTeachingTip
  * )
  * ```
  */
+@EmitsOneElement
 @Composable
 fun TeachingTip(
     isOpen: Boolean,
@@ -43,7 +46,7 @@ fun TeachingTip(
     closeButtonText: String = "",
     lightDismiss: Boolean = false,
     placement: TeachingTipPlacementMode = TeachingTipPlacementMode.Auto,
-    content: @Composable () -> Unit = {},
+    @AtMostOneElementContent content: @Composable () -> Unit = {},
 ) {
     val scope = currentRecomposeScope
     val targetElement = target?.element

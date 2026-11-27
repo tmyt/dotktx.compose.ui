@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.InfoBarSeverity
 import Microsoft.UI.Xaml.Controls.InfoBar as XamlInfoBar
 import Microsoft.UI.Xaml.Controls.ProgressRing as XamlProgressRing
@@ -10,6 +11,7 @@ import Microsoft.UI.Xaml.Controls.ProgressRing as XamlProgressRing
  * A spinning progress indicator (`ProgressRing`). It spins while [indeterminate] is true; otherwise it
  * shows [value] out of [maximum]. Nothing is drawn while [active] is false.
  */
+@EmitsOneElement
 @Composable
 fun ProgressRing(
     modifier: Modifier = Modifier,
@@ -38,6 +40,7 @@ enum class Severity { Informational, Success, Warning, Error }
  *     onDismiss = { saved = false })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun InfoBar(
     isOpen: Boolean,

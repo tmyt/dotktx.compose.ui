@@ -2,6 +2,8 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.AtMostOneElementContent
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.Border
 import Microsoft.UI.Xaml.Controls.SplitViewDisplayMode
 import Microsoft.UI.Xaml.Controls.SplitView as XamlSplitView
@@ -21,16 +23,17 @@ import Microsoft.UI.Xaml.Controls.SplitView as XamlSplitView
  * }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun SplitView(
     paneOpen: Boolean,
     onPaneOpenChange: (Boolean) -> Unit,
-    pane: @Composable () -> Unit,
+    @AtMostOneElementContent pane: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     displayMode: SplitViewDisplayMode = SplitViewDisplayMode.Overlay,
     openPaneLength: Double = Double.NaN,
     compactPaneLength: Double = Double.NaN,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     val scope = currentRecomposeScope
     Container({ SplitViewNode(XamlSplitView()) }, modifier, {

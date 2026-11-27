@@ -2,6 +2,7 @@ package dotktx.compose.ui.winui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import Microsoft.UI.Xaml.Controls.PipsPagerButtonVisibility
 import Microsoft.UI.Xaml.Controls.PipsPager as XamlPipsPager
 
@@ -14,6 +15,7 @@ import Microsoft.UI.Xaml.Controls.PipsPager as XamlPipsPager
  * PipsPager(numberOfPages = photos.size, selectedPageIndex = page, onSelectedPageIndexChange = { page = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun PipsPager(
     numberOfPages: Int,
