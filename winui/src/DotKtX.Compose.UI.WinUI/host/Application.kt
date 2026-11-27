@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
+import dotktx.compose.ui.annotations.RequiresSTAThread
 import Microsoft.UI.Dispatching.DispatcherQueue
 import Microsoft.UI.Xaml.Application
 import Microsoft.UI.Xaml.LaunchActivatedEventArgs
@@ -40,6 +41,7 @@ interface ApplicationScope {
  * }
  * ```
  */
+@RequiresSTAThread
 fun application(content: @Composable ApplicationScope.() -> Unit) {
     if (Thread.CurrentThread.GetApartmentState() == ApartmentState.STA) {
         runApplication(content)

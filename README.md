@@ -119,7 +119,7 @@ one.
 
 ```bash
 bash ../dotktx.compose/scripts/pack.sh   # Compose runtime and compiler plugin packages
-bash scripts/pack.sh                     # DotKtX.Compose.UI.WinUI into artifacts/packages
+bash scripts/pack.sh                     # DotKtX.Compose.UI.Annotations and .WinUI into artifacts/packages
 bash scripts/verify-packages.sh          # counter built from the packages, run with its UI Automation test
 ```
 

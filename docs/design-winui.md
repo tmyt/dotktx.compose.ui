@@ -676,6 +676,10 @@ the `XamlRoot`.
 
 ```text
 dotktx.compose.ui/
+  annotations/src/DotKtX.Compose.UI.Annotations/
+                       requirements that backends declare on their API, such as @RequiresSTAThread
+  analyzers/           K2 compiler plugin (FIR checkers) that reads those annotations, for kotc and the
+                       Kotlin LSP; built by scripts/build-analyzers.sh
   winui/src/DotKtX.Compose.UI.WinUI/
     buildTransitive/   application manifest and Windows App SDK version targets
     host/              application, Window, WindowState, ContentDialog, ComposeHost, UIRuntime,

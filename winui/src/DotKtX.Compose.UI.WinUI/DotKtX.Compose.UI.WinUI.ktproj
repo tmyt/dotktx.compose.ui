@@ -21,6 +21,7 @@
   </ItemGroup>
   <Import Project="$(DotKtXComposeRepo)eng/ComposeCompilerPlugin.targets" />
   <ItemGroup>
+    <ProjectReference Include="../../../annotations/src/DotKtX.Compose.UI.Annotations/DotKtX.Compose.UI.Annotations.ktproj" />
     <ProjectReference Include="$(DotKtXComposeRepo)src/Runtime/Runtime.ktproj" />
     <PackageReference Include="DotKtX.Coroutines" Version="$(DotKtXCoroutinesVersion)" />
     <PackageReference Include="DotKtX.AtomicFU" Version="$(DotKtXAtomicFUVersion)" />

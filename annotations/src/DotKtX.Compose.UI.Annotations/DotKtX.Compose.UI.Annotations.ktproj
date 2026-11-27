@@ -1,0 +1,16 @@
+<Project Sdk="DotKt.Sdk.Mpp">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <AssemblyName>DotKtX.Compose.UI.Annotations</AssemblyName>
+    <PackageId>DotKtX.Compose.UI.Annotations</PackageId>
+    <IsPackable>true</IsPackable>
+    <Version>$(DotKtXComposeUIVersion)</Version>
+    <Authors>yutaka</Authors>
+    <Description>Annotations that Compose UI backends on DotKt put on their API to declare requirements, such as a main thread in a single-threaded apartment, for DotKtX.Compose.UI.Analyzers to check.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <TargetFramework>net10.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <KotlinCompile Include="**/*.kt" />
+  </ItemGroup>
+</Project>
