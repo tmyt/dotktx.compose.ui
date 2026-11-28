@@ -104,11 +104,10 @@ fun main() = application {
     }
 }
 
-// An if chain: a `when (val p = …)` over WindowPosition made DotKt 0.9.34 emit invalid IL in a Release build.
-private fun describe(position: WindowPosition): String {
-    if (position is WindowPosition.Absolute) return "${position.x.toInt()},${position.y.toInt()}"
-    if (position == WindowPosition.Center) return "center"
-    return "default"
+private fun describe(position: WindowPosition): String = when (position) {
+    is WindowPosition.Absolute -> "${position.x.toInt()},${position.y.toInt()}"
+    WindowPosition.Center -> "center"
+    WindowPosition.PlatformDefault -> "default"
 }
 
 private fun yesNo(value: Boolean): String = if (value) "yes" else "no"

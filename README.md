@@ -21,8 +21,8 @@ fun main() = application {
 
 | Package | Kotlin package | State |
 |---|---|---|
-| `DotKtX.Compose.UI.WinUI` | `dotktx.compose.ui.winui` | experimental; DotKt SDK 0.9.34 |
-| `DotKtX.Compose.UI.AppKit` | `dotktx.compose.ui.appkit` | experimental; DotKt SDK 0.9.34 |
+| `DotKtX.Compose.UI.WinUI` | `dotktx.compose.ui.winui` | experimental; DotKt SDK 0.9.36 |
+| `DotKtX.Compose.UI.AppKit` | `dotktx.compose.ui.appkit` | experimental; DotKt SDK 0.9.36 |
 
 The same program on AppKit (macOS). Controls take title strings instead of content, and `main` needs no
 thread attribute because AppKit runs on the main thread:
@@ -41,7 +41,7 @@ fun main() = application {
 
 Design: [`docs/design-winui.md`](docs/design-winui.md), [`docs/design-appkit.md`](docs/design-appkit.md).
 
-## Status (2026-11-25, DotKt SDK 0.9.34)
+## Status (2026-11-29, DotKt SDK 0.9.36)
 
 `DotKtX.Compose.UI.WinUI` is its own assembly over the separately built Compose runtime DLL. All
 eight samples (counter, gallery, shell, interop, inputs, pickers, collections, commands) run on
@@ -165,7 +165,7 @@ A complete application project:
 with `global.json` pinning the DotKt SDK the packages were built with:
 
 ```json
-{ "msbuild-sdks": { "DotKt.Sdk": "0.9.34" } }
+{ "msbuild-sdks": { "DotKt.Sdk": "0.9.36" } }
 ```
 
 The library is compiled against the Windows SDK projection that .NET SDK 10 selects

@@ -1,7 +1,7 @@
 {
   "msbuild-sdks": {
-    "DotKt.Sdk.Mpp": "0.9.34",
-    "DotKt.Sdk": "0.9.34",
+    "DotKt.Sdk.Mpp": "0.9.36",
+    "DotKt.Sdk": "0.9.36",
     "Microsoft.Build.NoTargets": "3.7.134"
   }
 }

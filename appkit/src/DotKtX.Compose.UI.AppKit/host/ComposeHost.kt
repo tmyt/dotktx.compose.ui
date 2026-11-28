@@ -60,9 +60,7 @@ open class ComposeHost : NSView() {
     }
 
     private fun compose() {
-        // Not `?: return`: DotKt 0.9.34 emits invalid IL for an elvis-return in a Release build.
-        val body = content
-        if (body == null) return
+        val body = content ?: return
         val runtime = UIRuntime.forMainThread()
         val target = composition ?: Composition(AppKitApplier(HostRoot(contentHost)), runtime.recomposer).also { composition = it }
         target.setContent {

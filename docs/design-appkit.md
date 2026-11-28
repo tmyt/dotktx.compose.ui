@@ -368,7 +368,7 @@ until new entries arrive.
 
 ## 9. DotKt notes
 
-Facts verified while building this backend (DotKt SDK 0.9.34):
+Facts verified while building this backend (DotKt SDK 0.9.34 to 0.9.36):
 
 - **CGFloat is `NFloat`.** Pass `NFloat(x)` and read `.Value` (`System.Runtime.InteropServices.NFloat`);
   `CGRect`, `CGSize`, `CGPoint` constructors take doubles.
@@ -379,13 +379,12 @@ Facts verified while building this backend (DotKt SDK 0.9.34):
   application builds one with `ShiftKeyMask xor ShiftKeyMask`.
 - Kotlin classes can subclass `NSView` and `NSScrollView` and override `Layout()`, `Tile()`,
   `IsFlipped` and `IntrinsicContentSize`.
-- **Release builds.** DotKt 0.9.34 emits invalid IL (`InvalidProgramException` when the method first runs)
-  for some constructs when optimizing. Avoid in library and sample code:
-  - `x ?: return`, `x as? T ?: throw …` and `x?.let { return it }`; write `val v = x; if (v == null) return`
-    and `if (x !is T) throw …`.
-  - In the gallery, a `when (val p = state.position)` over the `WindowPosition` object and data class
-    branches inside a composable; it is an `if` chain in a helper function instead.
-  Debug builds are not affected, so run Release builds.
+- **Release builds.** DotKt 0.9.34 emitted invalid IL (`InvalidProgramException` when the method first
+  ran) for `x ?: return`, `x as? T ?: throw …`, `x?.let { return it }` and a `when` over a sealed class
+  inside a composable, because the trimmer recomputed `maxstack` without the stack depth kept across an
+  early exit ([dotkt#2041](https://github.com/tmyt/dotkt/issues/2041)). DotKt 0.9.35 fixed it; the
+  backend builds on 0.9.36 and the smoke test runs in Release with those constructs restored. Debug
+  builds were never affected, so a Release run of the smoke test stays the check.
 
 ## 10. Source layout
 

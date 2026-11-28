@@ -27,7 +27,7 @@
     <_DotKtXHostArchitecture>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</_DotKtXHostArchitecture>
     <DotKtXAppKitRuntimeIdentifier>osx-$(_DotKtXHostArchitecture)</DotKtXAppKitRuntimeIdentifier>
     <DotKtXComposeUIVersion>0.3.2</DotKtXComposeUIVersion>
-    <DotKtXAtomicFUVersion>[0.9.14]</DotKtXAtomicFUVersion>
-    <DotKtXCoroutinesVersion>[0.9.14]</DotKtXCoroutinesVersion>
+    <DotKtXAtomicFUVersion>[0.9.16]</DotKtXAtomicFUVersion>
+    <DotKtXCoroutinesVersion>[0.9.15]</DotKtXCoroutinesVersion>
   </PropertyGroup>
 </Project>
