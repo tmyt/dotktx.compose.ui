@@ -240,7 +240,9 @@ class ContentHost internal constructor() : Panel() {
     }
 
     override fun arrange(bounds: CGRect) {
-        val child = children.firstOrNull() ?: return
+        // Not `?: return`: DotKt 0.9.34 emits invalid IL for an elvis-return in a Release build.
+        val child = children.firstOrNull()
+        if (child == null) return
         arrangeChild(child, deflate(bounds, padding), Alignment.Stretch)
     }
 }

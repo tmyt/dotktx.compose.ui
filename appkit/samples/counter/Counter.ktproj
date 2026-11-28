@@ -3,6 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>$(DotKtXAppKitTargetFramework)</TargetFramework>
     <ApplicationId>dev.dotktx.compose.counter</ApplicationId>
+    <RuntimeIdentifier>$(DotKtXAppKitRuntimeIdentifier)</RuntimeIdentifier>
     <StartupObject>CounterKt</StartupObject>
   </PropertyGroup>
   <!-- The package applies this through buildTransitive; a ProjectReference has to import it. -->

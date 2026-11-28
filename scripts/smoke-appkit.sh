@@ -4,7 +4,8 @@
 # Build first with scripts/build-appkit.sh. A hung run is killed after the timeout.
 set -euo pipefail
 REPO="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)"
-app="$REPO/artifacts/bin/appkit/tests/smoke/Release/net10.0-macos26.0/osx-arm64/Smoke.app/Contents/MacOS/Smoke"
+case "$(uname -m)" in arm64) rid=osx-arm64 ;; *) rid=osx-x64 ;; esac
+app="$REPO/artifacts/bin/appkit/tests/smoke/Release/net10.0-macos26.0/$rid/Smoke.app/Contents/MacOS/Smoke"
 log="$REPO/artifacts/logs/appkit-smoke.run.log"
 mkdir -p "$REPO/artifacts/logs"
 timeout_seconds="${SMOKE_TIMEOUT:-120}"

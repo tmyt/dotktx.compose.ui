@@ -46,7 +46,8 @@ internal class UIRuntime private constructor() {
 
         /** The main thread's runtime, created on first use. Throws when called off the main thread. */
         fun forMainThread(): UIRuntime {
-            instance?.let { return it }
+            val existing = instance
+            if (existing != null) return existing
             if (!NSThread.IsMain) {
                 throw IllegalStateException("Compose for AppKit runs on the main thread")
             }

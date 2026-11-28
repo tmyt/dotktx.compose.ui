@@ -22,6 +22,10 @@
          The Apple SDK's exact Xcode-version check is disabled for that reason (it fails with any newer Xcode). -->
     <DotKtXAppKitTargetFramework>net10.0-macos26.0</DotKtXAppKitTargetFramework>
     <ValidateXcodeVersion>false</ValidateXcodeVersion>
+    <!-- Without a RuntimeIdentifier, a Release build makes a universal (arm64 + x64) bundle whose lipo-merged
+         libraries fail code-signature validation at launch; applications build for the machine's architecture. -->
+    <_DotKtXHostArchitecture>$([System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant())</_DotKtXHostArchitecture>
+    <DotKtXAppKitRuntimeIdentifier>osx-$(_DotKtXHostArchitecture)</DotKtXAppKitRuntimeIdentifier>
     <DotKtXComposeUIVersion>0.3.2</DotKtXComposeUIVersion>
     <DotKtXAtomicFUVersion>[0.9.14]</DotKtXAtomicFUVersion>
     <DotKtXCoroutinesVersion>[0.9.14]</DotKtXCoroutinesVersion>

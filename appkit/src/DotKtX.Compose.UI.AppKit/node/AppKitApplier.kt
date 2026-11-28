@@ -12,9 +12,9 @@ internal class AppKitApplier(root: Node) : AbstractApplier<Node>(root) {
     override fun insertTopDown(index: Int, instance: Node) {}
 
     override fun insertBottomUp(index: Int, instance: Node) {
-        val element = instance as? ElementNode<*>
-            ?: throw IllegalStateException("Only element nodes can be children")
-        current.children.insert(index, element)
+        // Not `as? … ?: throw`: DotKt 0.9.34 emits invalid IL for an elvis-jump in a Release build.
+        if (instance !is ElementNode<*>) throw IllegalStateException("Only element nodes can be children")
+        current.children.insert(index, instance)
     }
 
     override fun remove(index: Int, count: Int) {

@@ -138,8 +138,9 @@ private data class PaddingModifier(val insets: Insets) : ElementModifier {
 private val warnedNoPadding = HashSet<String>()
 
 private fun warnNoPadding(node: ElementNode<*>) {
-    val type = node.view::class.simpleName ?: return
-    if (warnedNoPadding.add(type)) println("dotktx.compose.ui.appkit: Modifier.padding has no effect on $type, which has no children to pad")
+    // Not `?: return`: DotKt 0.9.34 emits invalid IL for an elvis-return in a Release build.
+    val type = node.view::class.simpleName
+    if (type != null && warnedNoPadding.add(type)) println("dotktx.compose.ui.appkit: Modifier.padding has no effect on $type, which has no children to pad")
 }
 
 /** One of the six size bounds; the [property] name is the key, so each bound is diffed on its own. */
