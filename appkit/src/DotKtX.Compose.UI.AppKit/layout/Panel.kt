@@ -1,6 +1,9 @@
 package dotktx.compose.ui.appkit
 
+import AppKit.NSClipView
+import AppKit.NSControl
 import AppKit.NSView
+import AppKit.NSWindowOrderingMode
 import CoreGraphics.CGRect
 import CoreGraphics.CGSize
 
@@ -23,20 +26,43 @@ abstract class Panel internal constructor() : NSView() {
         }
 
     internal fun insert(index: Int, child: ElementNode<*>) {
-        TODO("U2")
+        val view = child.view
+        children.add(index, child)
+        if (index == 0) {
+            if (children.size > 1) AddSubview(view, NSWindowOrderingMode.Below, children[1].view) else AddSubview(view)
+        } else {
+            AddSubview(view, NSWindowOrderingMode.Above, children[index - 1].view)
+        }
+        invalidateLayout()
     }
 
     internal fun remove(index: Int, count: Int) {
-        TODO("U2")
+        repeat(count) {
+            val child = children.removeAt(index)
+            child.view.RemoveFromSuperview()
+        }
+        invalidateLayout()
     }
 
     /** Same contract as `AbstractApplier.move`: [to] is the destination index before the items are removed. */
     internal fun move(from: Int, to: Int, count: Int) {
-        TODO("U2")
+        if (count <= 0 || from == to) return
+        val moved = ArrayList<ElementNode<*>>(children.subList(from, from + count))
+        repeat(count) { children.removeAt(from) }
+        val target = if (from > to) to else to - count
+        children.addAll(target, moved)
+        // Re-adding every child in order restores the z-order of composition order.
+        for (child in children) {
+            child.view.RemoveFromSuperview()
+            AddSubview(child.view)
+        }
+        invalidateLayout()
     }
 
     internal fun clear() {
-        TODO("U2")
+        for (child in children) child.view.RemoveFromSuperview()
+        children.clear()
+        invalidateLayout()
     }
 
     /**
@@ -48,9 +74,19 @@ abstract class Panel internal constructor() : NSView() {
     /** Places the children inside [bounds] (the panel's full bounds; [padding] is subtracted here). */
     internal abstract fun arrange(bounds: CGRect)
 
+    private var invalidating = false
+
     /** Marks this panel and the panels above it for a new measure and arrange pass. */
     internal fun invalidateLayout() {
-        TODO("U2")
+        if (invalidating) return
+        invalidating = true
+        try {
+            NeedsLayout = true
+            InvalidateIntrinsicContentSize()
+            invalidateAncestors(this)
+        } finally {
+            invalidating = false
+        }
     }
 
     override fun Layout() {
@@ -64,11 +100,78 @@ abstract class Panel internal constructor() : NSView() {
 }
 
 /**
+ * Marks the ancestors of [from] for layout. Panels, scroll views and the clip view between a scroll
+ * view and its document are walked through; the walk ends after the first other ancestor (which
+ * still gets `NeedsLayout`, e.g. the view that hosts the composition).
+ */
+internal fun invalidateAncestors(from: NSView) {
+    var parent = from.Superview
+    while (parent != null) {
+        parent.NeedsLayout = true
+        if (parent is Panel || parent is ScrollPanel) {
+            parent.InvalidateIntrinsicContentSize()
+        } else if (parent !is NSClipView) {
+            return
+        }
+        parent = parent.Superview
+    }
+}
+
+private fun unbounded(v: Double): Boolean = v.isNaN() || v.isInfinite()
+
+private fun clamp(v: Double, min: Double, max: Double): Double {
+    var r = v
+    if (!min.isNaN()) r = maxOf(r, min)
+    if (!max.isNaN()) r = minOf(r, max)
+    return r
+}
+
+/** [v] minus [by], staying unbounded when it is and never negative. */
+internal fun shrink(v: Double, by: Double): Double = if (unbounded(v)) v else maxOf(0.0, v - by)
+
+internal fun deflate(r: CGRect, pad: Insets): CGRect = CGRect(
+    r.X.Value + pad.start,
+    r.Y.Value + pad.top,
+    maxOf(0.0, r.Width.Value - pad.horizontal),
+    maxOf(0.0, r.Height.Value - pad.vertical),
+)
+
+/**
  * Measures one child for [available] (the space left for the child itself, margins already removed),
- * honoring the fixed and bounded sizes of its [LayoutParams].
+ * honoring the fixed and bounded sizes of its [LayoutParams]. A hidden child measures as zero.
  */
 internal fun measureChild(child: ElementNode<*>, available: CGSize): CGSize {
-    TODO("U2")
+    val view = child.view
+    if (view.Hidden) return CGSize(0.0, 0.0)
+    val p = child.layout
+    var aw = available.Width.Value
+    var ah = available.Height.Value
+    if (!p.maxWidth.isNaN()) aw = if (unbounded(aw)) p.maxWidth else minOf(aw, p.maxWidth)
+    if (!p.maxHeight.isNaN()) ah = if (unbounded(ah)) p.maxHeight else minOf(ah, p.maxHeight)
+    if (!p.width.isNaN()) aw = p.width
+    if (!p.height.isNaN()) ah = p.height
+
+    var w: Double
+    var h: Double
+    if (view is Panel) {
+        val s = view.measure(CGSize(aw, ah))
+        w = s.Width.Value
+        h = s.Height.Value
+    } else if (view is NSControl) {
+        val s = view.SizeThatFits(CGSize(if (unbounded(aw)) 1e9 else aw, if (unbounded(ah)) 1e9 else ah))
+        w = s.Width.Value
+        h = s.Height.Value
+    } else {
+        val intrinsic = view.IntrinsicContentSize
+        val fitting = view.FittingSize
+        w = if (intrinsic.Width.Value >= 0.0) intrinsic.Width.Value else fitting.Width.Value
+        h = if (intrinsic.Height.Value >= 0.0) intrinsic.Height.Value else fitting.Height.Value
+    }
+    if (!p.width.isNaN()) w = p.width
+    if (!p.height.isNaN()) h = p.height
+    w = clamp(w, p.minWidth, p.maxWidth)
+    h = clamp(h, p.minHeight, p.maxHeight)
+    return CGSize(maxOf(0.0, w), maxOf(0.0, h))
 }
 
 /**
@@ -76,7 +179,47 @@ internal fun measureChild(child: ElementNode<*>, available: CGSize): CGSize {
  * alignment ([defaultAlignment] when it has none), then sets `view.Frame`.
  */
 internal fun arrangeChild(child: ElementNode<*>, slot: CGRect, defaultAlignment: Alignment) {
-    TODO("U2")
+    val view = child.view
+    if (view.Hidden) return
+    val p = child.layout
+    val m = p.margin
+    val sx = slot.X.Value + m.start
+    val sy = slot.Y.Value + m.top
+    val sw = maxOf(0.0, slot.Width.Value - m.horizontal)
+    val sh = maxOf(0.0, slot.Height.Value - m.vertical)
+    val alignment = p.alignment ?: defaultAlignment
+    val measured = measureChild(child, CGSize(sw, sh))
+
+    var w: Double
+    var x = sx
+    if (alignment.horizontal == Alignment.Horizontal.Stretch) {
+        w = clamp(sw, p.minWidth, p.maxWidth)
+        if (!p.width.isNaN()) w = p.width
+    } else {
+        w = measured.Width.Value
+    }
+    w = maxOf(0.0, w)
+    when (alignment.horizontal) {
+        Alignment.Horizontal.Center -> x = sx + (sw - w) / 2
+        Alignment.Horizontal.Trailing -> x = sx + sw - w
+        else -> {}
+    }
+
+    var h: Double
+    var y = sy
+    if (alignment.vertical == Alignment.Vertical.Stretch) {
+        h = clamp(sh, p.minHeight, p.maxHeight)
+        if (!p.height.isNaN()) h = p.height
+    } else {
+        h = measured.Height.Value
+    }
+    h = maxOf(0.0, h)
+    when (alignment.vertical) {
+        Alignment.Vertical.Center -> y = sy + (sh - h) / 2
+        Alignment.Vertical.Bottom -> y = sy + sh - h
+        else -> {}
+    }
+    view.Frame = CGRect(x, y, w, h)
 }
 
 /**
@@ -85,10 +228,19 @@ internal fun arrangeChild(child: ElementNode<*>, slot: CGRect, defaultAlignment:
  */
 class ContentHost internal constructor() : Panel() {
     override fun measure(available: CGSize): CGSize {
-        TODO("U2")
+        val pad = padding
+        val child = children.firstOrNull()
+        if (child == null || child.view.Hidden) return CGSize(pad.horizontal, pad.vertical)
+        val m = child.layout.margin
+        val s = measureChild(
+            child,
+            CGSize(shrink(available.Width.Value, pad.horizontal + m.horizontal), shrink(available.Height.Value, pad.vertical + m.vertical)),
+        )
+        return CGSize(s.Width.Value + m.horizontal + pad.horizontal, s.Height.Value + m.vertical + pad.vertical)
     }
 
     override fun arrange(bounds: CGRect) {
-        TODO("U2")
+        val child = children.firstOrNull() ?: return
+        arrangeChild(child, deflate(bounds, padding), Alignment.Stretch)
     }
 }
