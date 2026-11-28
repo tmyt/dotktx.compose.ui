@@ -2,8 +2,9 @@
 
 Compose for native UI toolkits on DotKt. Application code is ordinary Compose (`@Composable`,
 `remember`, `mutableStateOf`, effects, `CompositionLocal`); the tree Compose maintains is a tree of
-native WinUI 3 elements. WinUI keeps layout, rendering, input, text, IME, accessibility and theming.
-It is built directly on the Compose runtime (`DotKtX.AndroidX.Compose.Runtime`, from
+native WinUI 3 elements (on Windows) or AppKit views (on macOS). The toolkit keeps rendering, input,
+text, IME, accessibility and theming; WinUI also keeps layout, while the AppKit backend lays out its
+containers itself. It is built directly on the Compose runtime (`DotKtX.AndroidX.Compose.Runtime`, from
 `dotktx.compose`), not on `androidx.compose.ui`.
 
 ```kotlin
@@ -21,8 +22,24 @@ fun main() = application {
 | Package | Kotlin package | State |
 |---|---|---|
 | `DotKtX.Compose.UI.WinUI` | `dotktx.compose.ui.winui` | experimental; DotKt SDK 0.9.34 |
+| `DotKtX.Compose.UI.AppKit` | `dotktx.compose.ui.appkit` | experimental; DotKt SDK 0.9.34 |
 
-Design: [`docs/design-winui.md`](docs/design-winui.md).
+The same program on AppKit (macOS). Controls take title strings instead of content, and `main` needs no
+thread attribute because AppKit runs on the main thread:
+
+```kotlin
+fun main() = application {
+    Window(onCloseRequest = ::exitApplication, title = "Counter") {
+        var count by remember { mutableIntStateOf(0) }
+        StackView(Modifier.align(Alignment.Center), spacing = 8.0, alignment = Alignment.Center) {
+            Label("Count: $count")
+            Button("Increment", onClick = { count++ })
+        }
+    }
+}
+```
+
+Design: [`docs/design-winui.md`](docs/design-winui.md), [`docs/design-appkit.md`](docs/design-appkit.md).
 
 ## Status (2026-11-25, DotKt SDK 0.9.34)
 
@@ -51,6 +68,24 @@ Windows and pass their UI Automation tests.
 Inputs are controlled: the composition's value is the source of truth, and an edit the application
 does not accept is undone.
 
+### Status of the AppKit backend
+
+`DotKtX.Compose.UI.AppKit` has two samples (counter, gallery) and an in-process smoke test.
+
+| Composables | |
+|---|---|
+| Host | `application`, `Window` (multiple windows, close through `onCloseRequest`, `rememberWindowState`: size, position, maximized), `ComposeHost` (Compose inside an existing AppKit view tree) |
+| Text and buttons | `Label`, `Button` |
+| Inputs | `TextField`, `SecureTextField`, `CheckBox`, `RadioButton`, `Switch`, `Slider`, `PopUpButton` |
+| Status | `ProgressIndicator` |
+| Layout | `StackView`, `Box`, `ScrollView` |
+| Menus | `MenuBar` (`MenuBarMenu`), `MenuEntry`, `Modifier.contextMenu` |
+| Interop | `AppKitView` (any other `NSView`) |
+| Modifiers | `align`, `margin`, `padding`, `width`, `height`, `size`, `widthIn`, `heightIn`, `alpha`, `toolTip`, `semantics`, `testTag`, `hidden`, `contextMenu` |
+| Locals | `LocalWindow`, `LocalDispatchQueue` |
+
+Inputs are controlled, as in the WinUI backend.
+
 ## Build
 
 Requires .NET SDK 10 or 11, Java 21+ on `PATH`, network access for the first build, and a checkout
@@ -75,6 +110,23 @@ runtimeconfig.json. Apps that start WinUI themselves call `bootstrapWindowsAppSD
 
 On WSL with Windows interop, `bash scripts/uia.sh <sample>` (for example `counter`) starts a sample on Windows
 and runs its UI Automation test (`winui/tests/uia/`).
+
+### Build on macOS
+
+Requires macOS with the .NET SDK's `macos` workload, Xcode, Java 21+ on `PATH` and a checkout of
+`dotktx.compose` next to this repository (`../dotktx.compose`).
+
+```bash
+bash scripts/build-appkit.sh   # counter, gallery and the smoke test
+bash scripts/smoke-appkit.sh   # runs appkit/tests/smoke
+```
+
+Output: `artifacts/bin/appkit/samples/<sample>/Release/net10.0-macos26.0/<rid>/<Name>.app` (`Counter.app`,
+`Gallery.app`), with `<rid>` `osx-arm64` or `osx-x64` for the machine. Applications target
+`net10.0-macos26.0`, the SDK pack that is pinned; `Directory.Build.props` sets `ValidateXcodeVersion=false`
+because that pack builds with any newer Xcode, which this setup expects. Applications build for the host
+architecture (a universal Release bundle fails code-signature validation). Design:
+[`docs/design-appkit.md`](docs/design-appkit.md).
 
 ## Packages
 
