@@ -1,0 +1,10 @@
+<Project>
+  <!-- The .NET for macOS SDK imports Xamarin.Mac.$(Language).targets, and DotKt projects report the
+       language "Kotlin", for which no such file exists. The targets file below switches the language to C#
+       just before the macOS SDK targets are imported (they are appended to AfterMicrosoftNETSdkTargets by
+       the SDK's props); Xamarin.Mac.CSharp.targets only sets ResolveAssemblyConflicts and imports the common
+       targets. Prepended, so it runs first whether the SDK's own entry is already in the list or not. -->
+  <PropertyGroup>
+    <AfterMicrosoftNETSdkTargets>$(MSBuildThisFileDirectory)DotKtX.Compose.UI.AppKit.Language.targets;$(AfterMicrosoftNETSdkTargets)</AfterMicrosoftNETSdkTargets>
+  </PropertyGroup>
+</Project>

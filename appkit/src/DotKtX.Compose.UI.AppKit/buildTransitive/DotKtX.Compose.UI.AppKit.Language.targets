@@ -1,0 +1,6 @@
+<Project>
+  <!-- See DotKtX.Compose.UI.AppKit.props. Only the macOS SDK's language-specific import reads this. -->
+  <PropertyGroup Condition="'$(TargetPlatformIdentifier)' == 'macOS'">
+    <Language>C#</Language>
+  </PropertyGroup>
+</Project>

@@ -18,6 +18,10 @@
          with either .NET SDK provide the WinRT.Runtime version it references or a newer one. -->
     <WindowsSdkPackageVersion>10.0.19041.57</WindowsSdkPackageVersion>
     <DotKtXWindowsAppSDKVersion>2.2.0</DotKtXWindowsAppSDKVersion>
+    <!-- macOS: the SDK pack for platform version 26.0 is pinned; Xcode only has to be at least that version.
+         The Apple SDK's exact Xcode-version check is disabled for that reason (it fails with any newer Xcode). -->
+    <DotKtXAppKitTargetFramework>net10.0-macos26.0</DotKtXAppKitTargetFramework>
+    <ValidateXcodeVersion>false</ValidateXcodeVersion>
     <DotKtXComposeUIVersion>0.3.2</DotKtXComposeUIVersion>
     <DotKtXAtomicFUVersion>[0.9.14]</DotKtXAtomicFUVersion>
     <DotKtXCoroutinesVersion>[0.9.14]</DotKtXCoroutinesVersion>
