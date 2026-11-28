@@ -1,6 +1,7 @@
 package dotktx.compose.ui.appkit
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import AppKit.NSProgressIndicator
 import AppKit.NSProgressIndicatorStyle
 
@@ -11,6 +12,7 @@ import AppKit.NSProgressIndicatorStyle
  * ProgressIndicator(value = done, max = total)
  * ```
  */
+@EmitsOneElement
 @Composable
 fun ProgressIndicator(
     value: Double,

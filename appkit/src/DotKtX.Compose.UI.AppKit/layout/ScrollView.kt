@@ -1,6 +1,8 @@
 package dotktx.compose.ui.appkit
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
+import dotktx.compose.ui.annotations.AtMostOneElementContent
 import AppKit.NSScrollView
 import CoreGraphics.CGRect
 import CoreGraphics.CGSize
@@ -18,11 +20,12 @@ enum class ScrollDirection { Vertical, Horizontal, Both }
  * ScrollView(Modifier.height(200.0)) { StackView { repeat(50) { Label("Row $it") } } }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun ScrollView(
     modifier: Modifier = Modifier,
     direction: ScrollDirection = ScrollDirection.Vertical,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     Container({
         val scroll = ScrollPanel()

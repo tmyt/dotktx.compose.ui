@@ -17,7 +17,11 @@
     <KotlinCompile Include="**/*.kt" />
   </ItemGroup>
   <Import Project="$(DotKtXComposeRepo)eng/ComposeCompilerPlugin.targets" />
+  <Import Project="../../../eng/Analyzers.targets" />
   <ItemGroup>
+    <ProjectReference Include="../../../annotations/src/DotKtX.Compose.UI.Annotations/DotKtX.Compose.UI.Annotations.ktproj" />
+    <!-- Becomes a package dependency, so applications get the diagnostics without further setup. -->
+    <ProjectReference Include="../../../analyzers/DotKtX.Compose.UI.Analyzers.proj" />
     <ProjectReference Include="$(DotKtXComposeRepo)src/Runtime/Runtime.ktproj" />
     <PackageReference Include="DotKtX.Coroutines" Version="$(DotKtXCoroutinesVersion)" />
     <PackageReference Include="DotKtX.AtomicFU" Version="$(DotKtXAtomicFUVersion)" />

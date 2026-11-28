@@ -2,6 +2,7 @@ package dotktx.compose.ui.appkit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import AppKit.NSBezelStyle
 import AppKit.NSButton
 import AppKit.NSButtonType
@@ -14,6 +15,7 @@ import AppKit.NSCellStateValue
  * Button("Save", onClick = { save() })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun Button(
     title: String,
@@ -43,6 +45,7 @@ internal class ButtonNode(val button: NSButton) : ElementNode<NSButton>(button, 
  * CheckBox("I agree", checked = agreed, onCheckedChange = { agreed = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun CheckBox(
     title: String,
@@ -82,6 +85,7 @@ internal class CheckBoxNode(val button: NSButton) : ElementNode<NSButton>(button
  * RadioButton("Small", selected = size == 0, onSelect = { size = 0 })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun RadioButton(
     title: String,

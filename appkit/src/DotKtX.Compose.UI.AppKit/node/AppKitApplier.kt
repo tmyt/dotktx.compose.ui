@@ -9,12 +9,24 @@ import androidx.compose.runtime.AbstractApplier
  * view hierarchy once, so the enclosing panels lay out once for it instead of once per descendant.
  */
 internal class AppKitApplier(root: Node) : AbstractApplier<Node>(root) {
+    /** Single-child slots that held more than one child at some point of the current apply. */
+    private val overfull = ArrayList<ChildSlot.Single>()
+
     override fun insertTopDown(index: Int, instance: Node) {}
 
     override fun insertBottomUp(index: Int, instance: Node) {
         // Not `as? … ?: throw`: DotKt 0.9.34 emits invalid IL for an elvis-jump in a Release build.
         if (instance !is ElementNode<*>) throw IllegalStateException("Only element nodes can be children")
-        current.children.insert(index, instance)
+        val slot = current.children
+        slot.insert(index, instance)
+        if (slot is ChildSlot.Single && slot.overfull) overfull.add(slot)
+    }
+
+    override fun onEndChanges() {
+        if (overfull.isEmpty()) return
+        val failed = overfull.firstOrNull { it.overfull }
+        overfull.clear()
+        if (failed != null) throw failed.overfullError()
     }
 
     override fun remove(index: Int, count: Int) {

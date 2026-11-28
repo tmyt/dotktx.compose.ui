@@ -2,6 +2,7 @@ package dotktx.compose.ui.appkit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import AppKit.NSSlider
 
 /**
@@ -11,6 +12,7 @@ import AppKit.NSSlider
  * Slider(value = volume, onValueChange = { volume = it }, min = 0.0, max = 10.0)
  * ```
  */
+@EmitsOneElement
 @Composable
 fun Slider(
     value: Double,

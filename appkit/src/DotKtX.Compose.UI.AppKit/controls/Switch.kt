@@ -2,6 +2,7 @@ package dotktx.compose.ui.appkit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import AppKit.NSSwitch
 import System.IntPtr
 
@@ -12,6 +13,7 @@ import System.IntPtr
  * Switch(isOn = wifi, onToggle = { wifi = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun Switch(
     isOn: Boolean,

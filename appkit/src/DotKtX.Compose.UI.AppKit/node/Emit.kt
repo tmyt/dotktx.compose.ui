@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.Updater
+import dotktx.compose.ui.annotations.EmitsOneElement
 import AppKit.NSView
 
 /**
@@ -17,6 +18,7 @@ import AppKit.NSView
  * AppKitView(factory = { NSLevelIndicator() }, modifier = Modifier.margin(8.0)) { it.DoubleValue = level }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun <V : NSView> AppKitView(
     factory: () -> V,

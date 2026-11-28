@@ -124,6 +124,11 @@ the `Recomposer` (running `runRecomposeAndApplyChanges` from the first use) and 
 `ComposeHost` share it, so state written anywhere on the main thread recomposes all of them. `shutdown()`
 cancels the recomposer, the clock, the manager and the job and clears the singleton.
 
+An exception thrown during recomposition or while changes are applied (for example a second element
+in a single-child slot, §4) ends the recomposer, after which no window would update again. The runtime
+therefore ends the process with `Environment.FailFast`, as an unhandled exception does: the message
+and the stack trace go to the error output.
+
 ### 3.6 `Window`
 
 ```kotlin
@@ -194,7 +199,7 @@ open class ElementNode<out V : NSView> internal constructor(val view: V, childre
 | Slot | Used by | Behavior |
 |---|---|---|
 | `None` | `Label`, `Button`, every control, `AppKitView` | Inserting a child throws. |
-| `Single(owner, ContentHost)` | window content, `ScrollView`, `Box`, `ComposeHost` | One child, placed in the `ContentHost`; a second throws ("wrap several in a StackView"). |
+| `Single(owner, ContentHost)` | window content, `ScrollView`, `Box`, `ComposeHost` | At most one child once the changes are applied, placed in the `ContentHost`. Within one apply it can briefly hold two (content switching between two separate `if`s inserts the new element before the old one is removed); `AppKitApplier.onEndChanges` rejects a slot that still holds more than one ("`Window` content emitted 2 elements (NSTextField, NSTextField) but holds one; wrap them in a StackView"). The content parameters of these slots are marked `@AtMostOneElementContent` and element composables `@EmitsOneElement`, so `DotKtX.Compose.UI.Analyzers` reports a certain second element at build time. |
 | `Many(Panel)` | `StackView` | Children of the panel in composition order. |
 
 `AppKitApplier` inserts **bottom-up**: a new subtree is assembled while detached and joins the live view

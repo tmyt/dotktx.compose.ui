@@ -3,6 +3,7 @@ package dotktx.compose.ui.appkit
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLocalProvider
+import dotktx.compose.ui.annotations.AtMostOneElementContent
 import AppKit.NSView
 import AppKit.NSViewResizingMask
 import CoreFoundation.DispatchQueue
@@ -37,7 +38,7 @@ open class ComposeHost : NSView() {
     override val IsFlipped: Boolean get() = true
 
     /** Sets the content, replacing the previous one. It is composed now if the host is in a window. */
-    fun setContent(content: @Composable () -> Unit) {
+    fun setContent(@AtMostOneElementContent content: @Composable () -> Unit) {
         this.content = content
         if (Window != null) compose()
     }

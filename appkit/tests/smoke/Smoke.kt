@@ -68,6 +68,7 @@ private object S {
     var showSecond by mutableStateOf(false)
     var flag by mutableStateOf(false)
     var contextClicks by mutableIntStateOf(0)
+    var on by mutableStateOf(false)
 }
 
 fun main() {
@@ -120,6 +121,11 @@ private fun Content() {
             }
             Label("maybe hidden", Modifier.hidden(S.hide).testTag("maybe"))
             for (item in S.items) key(item) { Label("item $item", Modifier.testTag("item$item")) }
+            // Content switching between two separate ifs: within one apply the single-child slot briefly holds both.
+            Box(Modifier.testTag("slotSwitch")) {
+                if (S.on) Label("On", Modifier.testTag("slotOn"))
+                if (!S.on) Label("Off", Modifier.testTag("slotOff"))
+            }
             Label("context", Modifier.testTag("context").contextMenu(listOf(MenuEntry.Item("Hit") { S.contextClicks++ })))
             Button("Open second", { S.showSecond = true }, Modifier.testTag("openSecond"))
         }
@@ -226,6 +232,16 @@ private suspend fun ApplicationScope.scenario(state: WindowState) {
     settle()
     expect(find(root, "item3").Frame.Y.Value < find(root, "item1").Frame.Y.Value, "reordered items")
     expect(find(root, "item1").Superview === stack, "moved item still in the stack")
+
+    // Single-child slot switching between two separate ifs, in both directions.
+    expect(findOrNull(root, "slotOff") != null && findOrNull(root, "slotOn") == null, "slot shows Off")
+    S.on = true
+    settle()
+    expect(findOrNull(root, "slotOn") != null && findOrNull(root, "slotOff") == null, "slot switched to On")
+    expect(find(root, "slotOn").Superview === find(root, "slotSwitch"), "On is the box's child")
+    S.on = false
+    settle()
+    expect(findOrNull(root, "slotOff") != null && findOrNull(root, "slotOn") == null, "slot switched back to Off")
 
     // Scroll view: the document is at least the viewport.
     val scroll = find(root, "scroll") as AppKit.NSScrollView

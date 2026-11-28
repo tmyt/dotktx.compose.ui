@@ -1,6 +1,7 @@
 package dotktx.compose.ui.appkit
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import AppKit.NSFont
 import AppKit.NSLineBreakMode
 import AppKit.NSTextField
@@ -15,6 +16,7 @@ import System.Runtime.InteropServices.NFloat
  * Label("Hello", fontSize = 18.0)
  * ```
  */
+@EmitsOneElement
 @Composable
 fun Label(
     text: String,

@@ -1,6 +1,7 @@
 package dotktx.compose.ui.appkit
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
 import CoreGraphics.CGRect
 import CoreGraphics.CGSize
 
@@ -17,6 +18,7 @@ enum class Orientation { Vertical, Horizontal }
  * StackView(spacing = 8.0) { Label("Name"); TextField(name) { name = it } }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun StackView(
     modifier: Modifier = Modifier,

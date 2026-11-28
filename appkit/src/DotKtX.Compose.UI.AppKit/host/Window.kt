@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCompositionContext
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.staticCompositionLocalOf
+import dotktx.compose.ui.annotations.AtMostOneElementContent
 import AppKit.NSBackingStore
 import AppKit.NSWindow
 import AppKit.NSWindowStyle
@@ -36,7 +37,7 @@ fun ApplicationScope.Window(
     onCloseRequest: () -> Unit,
     title: String = "",
     state: WindowState = rememberWindowState(),
-    content: @Composable WindowScope.() -> Unit,
+    @AtMostOneElementContent content: @Composable WindowScope.() -> Unit,
 ) {
     val appHost = this as ApplicationHost
     val parent = rememberCompositionContext()

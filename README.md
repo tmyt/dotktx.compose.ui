@@ -70,7 +70,9 @@ does not accept is undone.
 
 ### Status of the AppKit backend
 
-`DotKtX.Compose.UI.AppKit` has two samples (counter, gallery) and an in-process smoke test.
+`DotKtX.Compose.UI.AppKit` has two samples (counter, gallery) and an in-process smoke test. Like the
+WinUI package it brings `DotKtX.Compose.UI.Analyzers`, which reports a second element in single-child
+content (`Window`, `Box`, `ScrollView`) at build time.
 
 | Composables | |
 |---|---|

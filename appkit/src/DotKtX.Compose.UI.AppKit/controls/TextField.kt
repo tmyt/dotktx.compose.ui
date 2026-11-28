@@ -2,6 +2,7 @@ package dotktx.compose.ui.appkit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import AppKit.NSSecureTextField
 import AppKit.NSTextField
 import AppKit.NSTextView
@@ -19,6 +20,7 @@ import System.IntPtr
  * TextField(text = name, onTextChange = { name = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun TextField(
     text: String,
@@ -38,6 +40,7 @@ fun TextField(
  * SecureTextField(text = password, onTextChange = { password = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun SecureTextField(
     text: String,

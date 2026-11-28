@@ -1,6 +1,8 @@
 package dotktx.compose.ui.appkit
 
 import androidx.compose.runtime.Composable
+import dotktx.compose.ui.annotations.EmitsOneElement
+import dotktx.compose.ui.annotations.AtMostOneElementContent
 import AppKit.NSColor
 import System.Runtime.InteropServices.NFloat
 
@@ -13,6 +15,7 @@ import System.Runtime.InteropServices.NFloat
  * Box(background = NSColor.Red, cornerRadius = 4.0) { Label("Warning") }
  * ```
  */
+@EmitsOneElement
 @Composable
 fun Box(
     modifier: Modifier = Modifier,
@@ -20,7 +23,7 @@ fun Box(
     borderColor: NSColor? = null,
     borderWidth: Double = 0.0,
     cornerRadius: Double = 0.0,
-    content: @Composable () -> Unit,
+    @AtMostOneElementContent content: @Composable () -> Unit,
 ) {
     Container({
         val host = ContentHost()

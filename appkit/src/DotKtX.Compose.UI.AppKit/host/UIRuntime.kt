@@ -1,6 +1,7 @@
 package dotktx.compose.ui.appkit
 
 import androidx.compose.runtime.Recomposer
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.setMain
 import CoreFoundation.DispatchQueue
 import Foundation.NSThread
+import System.Environment
 
 /**
  * The Compose machinery of the main thread: a coroutine dispatcher on the main queue, a frame
@@ -30,7 +32,25 @@ internal class UIRuntime private constructor() {
         // The main thread's dispatcher becomes Dispatchers.Main, so LaunchedEffect and plain Main code land on it.
         Dispatchers.setMain(dispatcher)
         snapshots.start()
-        scope.launch(start = CoroutineStart.UNDISPATCHED) { recomposer.runRecomposeAndApplyChanges() }
+        scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            try {
+                recomposer.runRecomposeAndApplyChanges()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Throwable) {
+                compositionFailed(e)
+            }
+        }
+    }
+
+    /**
+     * An exception from recomposition or from applying changes ends the recomposer, so no window
+     * would update again. The process ends like one with an unhandled exception: the message and
+     * stack trace go to the error output (and to a crash report, as for any aborted process).
+     */
+    private fun compositionFailed(e: Throwable): Nothing {
+        Environment.FailFast("Compose for AppKit: the composition failed.\n" + e.stackTraceToString())
+        throw e
     }
 
     fun shutdown() {

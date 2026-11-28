@@ -2,6 +2,7 @@ package dotktx.compose.ui.appkit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
+import dotktx.compose.ui.annotations.EmitsOneElement
 import AppKit.NSPopUpButton
 import System.IntPtr
 
@@ -12,6 +13,7 @@ import System.IntPtr
  * PopUpButton(items = listOf("Small", "Large"), selectedIndex = size, onSelectedIndexChange = { size = it })
  * ```
  */
+@EmitsOneElement
 @Composable
 fun PopUpButton(
     items: List<String>,
